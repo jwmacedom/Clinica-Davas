@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaVas | Neo-Clínica Dental</title>
+    <!-- Google Fonts para estilo futurista -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Conectamos la librería de Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-color: #0a0f1d;
+            --neon-cyan: #00f3ff;
+            --neon-blue: #0066ff;
+            --text-color: #e2e8f0;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Encabezado Cyberpunk */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 50px;
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            background: rgba(10, 15, 29, 0.8);
+            backdrop-filter: blur(10px);
+        }
+
+        header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            color: var(--neon-cyan);
+            letter-spacing: 2px;
+            margin: 0;
+            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+        }
+
+        /* Contenedor de la Tarjeta 3D */
+        .main-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            perspective: 1200px;
+            padding: 20px;
+        }
+
+        .card-wrapper {
+            width: 450px;
+            height: 280px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .card-wrapper.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            border: 2px solid rgba(0, 243, 255, 0.3);
+            box-shadow: 0 0 30px rgba(0, 102, 255, 0.2), inset 0 0 15px rgba(0, 243, 255, 0.1);
+            padding: 30px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* CARA A: Tarjeta de Presentación */
+        .card-front {
+            background: linear-gradient(135deg, #111827 0%, #0f172a 100%);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .logo-area h2 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0;
+            font-size: 28px;
+            background: linear-gradient(to right, #00f3ff, #0066ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo-area p {
+            margin: 5px 0 0 0;
+            font-size: 14px;
+            color: #94a3b8;
+            letter-spacing: 1px;
+        }
+
+        .chip {
+            width: 40px;
+            height: 30px;
+            background: linear-gradient(135deg, #22d3ee 0%, #0284c7 100%);
+            border-radius: 4px;
+            opacity: 0.7;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .info-dental {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .btn-neon {
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 10px 20px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-shadow: 0 0 5px var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.2);
+        }
+
+        .btn-neon:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 20px var(--neon-cyan);
+        }
+
+        /* CARA B: Formulario Cyber-Login */
+        .card-back {
+            background: linear-gradient(135deg, #0f172a 0%, #020617 100%);
+            transform: rotateY(180deg);
+        }
+
+        .card-back h3 {
+            font-family: 'Orbitron', sans-serif;
+            margin: 0 0 15px 0;
+            font-size: 20px;
+            color: var(--neon-cyan);
+            text-align: center;
+        }
+
+        .input-group {
+            margin-bottom: 12px;
+        }
+
+        .input-group input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            padding: 10px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        }
+
+        .login-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .btn-submit {
+            flex: 1;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan));
+            border: none;
+            color: white;
+            padding: 10px;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid #64748b;
+            color: #64748b;
+            padding: 10px;
+            font-family: 'Orbitron', sans-serif;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>DAVAS // DENTAL_SYSTEM</h1>
+        <div>v2.0.26</div>
+    </header>
+
+    <div class="main-container">
+        <div class="card-wrapper" id="cyberCard">
+            
+            <!-- CARA FRONT: Tarjeta de Presentación -->
+            <div class="card-face card-front">
+                <div class="card-header">
+                    <div class="logo-area">
+                        <h2>DaVas</h2>
+                        <p>CLÍNICA ODONTOLÓGICA</p>
+                    </div>
+                    <div class="chip"></div>
+                </div>
+                <div class="card-footer">
+                    <div class="info-dental">
+                        SYSTEM: AUTH_REQUIRED<br>
+                        UBICACIÓN: PORTAL_WEB<br>
+                        SERVICIO: ESTÉTICA & SALUD
+                    </div>
+                    <button class="btn-neon" onclick="toggleCard()">ACCEDER</button>
+                </div>
+            </div>
+
+            <!-- CARA BACK: Formulario Login -->
+            <div class="card-face card-back">
+                <h3>SECURE_LOGIN</h3>
+                <form id="loginForm">
+                    <div class="input-group">
+                        <input type="email" id="email" placeholder="CORREO_ELECTRÓNICO" required>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="password" placeholder="PASSWORD" required>
+                    </div>
+                    <div class="login-actions">
+                        <button type="button" class="btn-cancel" onclick="toggleCard()">VOLVER</button>
+                        <button type="submit" class="btn-submit">CONECTAR</button>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // Animación de giro
+        function toggleCard() {
+            document.getElementById('cyberCard').classList.toggle('flipped');
+        }
+
+        // --- AQUÍ CONECTAREMOS SUPABASE EN EL SIGUIENTE PASO ---
+        const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
+        const SUPABASE_ANON_KEY = "TU-CLAVE-ANON";
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    </script>
+</body>
+</html>
