@@ -3,103 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DaVas | Central Admin</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <title>DaVas | Central Admin Pro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
             --bg-color: #060a13;
+            --panel-bg: #0f172a;
             --neon-blue: #0066ff;
             --neon-cyan: #00f3ff;
+            --neon-green: #39ff14;
+            --neon-red: #ff0055;
             --text-color: #e2e8f0;
+            --text-muted: #64748b;
         }
         body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; }
         header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; border-bottom: 1px solid rgba(0, 102, 255, 0.3); background: #0a0f1d; }
         header h1 { font-family: 'Orbitron', sans-serif; font-size: 20px; color: var(--neon-blue); text-shadow: 0 0 10px rgba(0,102,255,0.5); margin: 0; }
         
-        .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
-        .cyber-table-box { background: #0f172a; border: 1px solid rgba(0, 102, 255, 0.2); border-radius: 8px; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; text-align: left; }
-        th { background: rgba(0, 102, 255, 0.1); color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-size: 13px; padding: 15px; border-bottom: 1px solid rgba(0, 102, 255, 0.2); }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px; color: #94a3b8; }
-        tr:hover { background: rgba(255,255,255,0.02); }
+        .btn-logout { background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); padding: 8px 15px; font-family: 'Orbitron', sans-serif; cursor: pointer; border-radius: 4px; font-weight: bold; }
+        .btn-logout:hover { background: var(--neon-red); color: black; box-shadow: 0 0 10px var(--neon-red); }
         
-        .btn-logout { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 8px 15px; font-family: 'Orbitron', sans-serif; cursor: pointer; border-radius: 4px; }
-        .btn-logout:hover { background: #ff0055; color: black; }
+        .admin-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 40px; max-width: 1600px; margin: 0 auto; }
+        @media (max-width: 1024px) { .admin-layout { grid-template-columns: 1fr; } }
+        
+        .cyber-box { background: var(--panel-bg); border: 1px solid rgba(0, 102, 255, 0.2); border-radius: 12px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
+        .cyber-box h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); margin-top: 0; border-bottom: 1px solid rgba(0,102,255,0.2); padding-bottom: 10px; font-size: 18px; }
+        
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(0, 102, 255, 0.1); color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-size: 12px; padding: 12px; border-bottom: 1px solid rgba(0, 102, 255, 0.2); }
+        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 15px; color: #fff; }
+        
+        .btn-tbl { font-family:'Orbitron'; font-size:10px; padding:5px 8px; border-radius:4px; cursor:pointer; font-weight:bold; background:transparent; transition:0.2s; margin-right:3px; }
+        .btn-aprob { border: 1px solid var(--neon-cyan); color: var(--neon-cyan); }
+        .btn-aprob:hover { background: var(--neon-cyan); color: #000; }
+        .btn-comp { border: 1px solid var(--neon-green); color: var(--neon-green); }
+        .btn-comp:hover { background: var(--neon-green); color: #000; }
+        .btn-chng { border: 1px solid #ffea00; color: #ffea00; }
+        .btn-chng:hover { background: #ffea00; color: #000; }
+        
+        .today-card { background: rgba(255,255,255,0.02); border-left: 3px solid var(--neon-green); padding: 12px; margin-bottom: 10px; border-radius: 0 6px 6px 0; font-size: 14px; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>MAIN_CORE // CONTROL_PANEL</h1>
+        <h1>MAIN_CORE // ADMINISTRATIVE_PANEL</h1>
         <button class="btn-logout" onclick="logout()">SHUTDOWN</button>
     </header>
 
-    <div class="container">
-        <h2 style="font-family:'Orbitron'; margin-bottom:20px; font-size:22px;">AGENDA_GLOBAL_DE_CITAS</h2>
-        
-        <div class="cyber-table-box">
-            <table>
-                <thead>
-                    <tr>
-                        <th>PACIENTE_ID</th>
-                        <th>FECHA_SISTEMA</th>
-                        <th>HORA_BLOQUE</th>
-                        <th>SERVICIO_SOLICITADO</th>
-                        <th>STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="adminTableBody">
-                    <tr><td colspan="5" style="text-align:center;">Sincronizando con la red de datos...</td></tr>
-                </tbody>
-            </table>
+    <div class="admin-layout">
+        <!-- SECCIÓN IZQUIERDA: CONTROL GLOBAL DE CITAS -->
+        <div class="cyber-box">
+            <h3>AGENDA_GLOBAL_OPERATIVA</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>PACIENTE</th>
+                            <th>FECHA / HORA</th>
+                            <th>SERVICIO</th>
+                            <th>ESTADO</th>
+                            <th>ACCIONES_DE_SISTEMA</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Sincronizando registros globales...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DERECHA: BARRA LATERAL DEL DÍA -->
+        <div class="cyber-box" style="background: #090f1e;">
+            <h3 style="color:var(--neon-green);">MONITOR_DIARIO // HOY</h3>
+            <div id="todayDateStr" style="font-family:'Orbitron'; font-size:14px; color:var(--text-muted); margin-bottom:15px; font-weight:bold;"></div>
+            <div id="todayAppointmentsLog">No hay flujos de pacientes agendados para hoy.</div>
         </div>
     </div>
 
     <script>
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co";
-        const SUPABASE_ANON_KEY = "TU_CLAVE_ANON_REAL_AQUI"; 
+        const SUPABASE_ANON_KEY = "TU_NUEVA_PUBLISHABLE_KEY_AQUÍ"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // SOLUCIÓN AL PESTAÑEO: Revisa el estado de la sesión activamente antes de pintar la tabla
+        // Obtener fecha local de hoy en formato YYYY-MM-DD
+        const hoy = new Date();
+        const hoyStr = hoy.toISOString().split('T')[0];
+        document.getElementById('todayDateStr').innerText = `SISTEMA_DATE: [ ${hoyStr} ]`;
+
         _supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
-                // Cargar todas las citas globales de la clínica
-                const { data: citas, error } = await _supabase.from('citas').select('*').order('fecha', { ascending: true });
-                const tbody = document.getElementById('adminTableBody');
-                if(!tbody) return;
-                
-                if (error || !citas || citas.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay flujos de citas activos.</td></tr>`;
-                    return;
-                }
-                
-                tbody.innerHTML = '';
-                citas.forEach(cita => {
-                    tbody.innerHTML += `
-                        <tr>
-                            <td style="font-family:'Orbitron'; font-size:12px; color:var(--neon-cyan);">${cita.id_paciente ? cita.id_paciente.substring(0,8) : 'S/D'}...</td>
-                            <td>${cita.fecha}</td>
-                            <td>${cita.hora}</td>
-                            <td style="color:#fff; font-weight:bold;">${cita.servicio}</td>
-                            <td><span style="color:#ffea00;">${cita.estado.toUpperCase()}</span></td>
-                        </tr>
-                    `;
-                });
+                loadGlobalData();
             } else {
-                // Si no hay sesión válida, se cancela y expulsa al inicio
                 window.location.href = 'index.html';
             }
         });
 
-        async function logout() {
-  const { error } = await _supabase.auth.signOut();
-  if (error) {
-    alert("Error al cerrar sesión: " + error.message);
-  } else {
-    window.location.href = 'index.html';
-  }
-}
+        async function loadGlobalData() {
+            // Cargar perfiles para emparejar nombres de los pacientes
+            const { data: perfiles } = await _supabase.from('perfiles').select('id, nombre');
+            const perfilMap = {};
+            if(perfiles) perfiles.forEach(p => perfilMap[p.id] = p.nombre);
+
+            // Obtener todas las citas ordenadas cronológicamente
+            const { data: citas, error } = await _supabase.from('citas').select('*').order('fecha', { ascending: true });
+            
+            const tbody = document.getElementById('adminTableBody');
+            const todayContainer = document.getElementById('todayAppointmentsLog');
+            
+            if (error || !citas || citas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No hay transmisiones de datos activas.</td></tr>`;
+                todayContainer.innerHTML = "<p style='color:var(--text-muted);'>Cero pacientes en el core del día.</p>";
+                return;
+            }
+
+            // 1. LIMPIAR Y RELLENAR TABLA GLOBAL
+            tbody.innerHTML = '';
+            todayContainer.innerHTML = '';
+            let contadorHoy = 0;
+
+            citas.forEach(cita => {
+                const nombrePaciente = perfilMap[cita.id_paciente] || `ID: ${cita.id_paciente.substring(0,6)}`;
+                
+                let selectAcciones = '';
+                if(cita.estado !== 'completada' && cita.estado !== 'cancelada') {
+                    selectAcciones = `
+                        <button class="btn-tbl btn-aprob" onclick="updateEstado('${cita.id}', 'aprobada')">APROBAR</button>
+                        <button class="btn-tbl btn-comp" onclick="updateEstado('${cita.id}', 'completada')">COMPLETAR</button>
+                        <button class="btn-tbl btn-chng" onclick="cambiarCitaPrompt('${cita.id}', '${cita.fecha}', '${cita.hora}')">CAMBIAR</button>
+                    `;
+                } else {
+                    selectAcciones = `<span style="color:var(--text-muted); font-size:12px; font-family:'Orbitron';">REGISTRO_CERRADO</span>`;
+                }
+
+                // Color de estado estético
+                let colorEstado = '#ffea00';
+                if(cita.estado === 'aprobada') colorEstado = var(--neon-cyan);
+                if(cita.estado === 'completada') colorEstado = var(--neon-green);
+                if(cita.estado === 'cancelada') colorEstado = var(--neon-red);
+
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-weight:600;">${nombrePaciente}</td>
+                        <td>📅 ${cita.fecha} &nbsp;&nbsp; ⏰ ${cita.hora}</td>
+                        <td style="color:#fff; font-weight:bold;">${cita.servicio}</td>
+                        <td><span style="color:${colorEstado}; font-weight:bold; font-family:'Orbitron'; font-size:12px;">${cita.estado.toUpperCase()}</span></td>
+                        <td>${selectAcciones}</td>
+                    </tr>
+                `;
+
+                // 2. FILTRAR EN TIEMPO REAL PARA EL MONITOR LATERAL DIARIO
+                if(cita.fecha === hoyStr && cita.estado !== 'cancelada') {
+                    contadorHoy++;
+                    todayContainer.innerHTML += `
+                        <div class="today-card" style="border-left-color: ${cita.estado === 'completada' ? 'var(--neon-green)' : 'var(--neon-cyan)'}">
+                            <div style="font-weight:700; color:#fff;">⏰ ${cita.hora} — ${nombrePaciente}</div>
+                            <div style="color:var(--text-muted); font-size:13px; margin-top:3px;">${cita.servicio}</div>
+                            <div style="font-size:11px; font-family:'Orbitron'; color:${colorEstado}; margin-top:4px;">STATUS: ${cita.estado.toUpperCase()}</div>
+                        </div>
+                    `;
+                }
+            });
+
+            if(contadorHoy === 0) {
+                todayContainer.innerHTML = "<p style='color:var(--text-muted); font-size:14px;'>No hay citas agendadas ni pendientes para la fecha de hoy.</p>";
+            }
+        }
+
+        async function updateEstado(id, nuevoEstado) {
+            const { error } = await _supabase.from('citas').update({ estado: nuevoEstado }).eq('id', id);
+            if(error) alert("Error: " + error.message);
+            else loadGlobalData();
+        }
+
+        async function cambiarCitaPrompt(id, fechaActual, horaActual) {
+            const nuevaFecha = prompt("Ingrese la nueva fecha (AAAA-MM-DD):", fechaActual);
+            if (!nuevaFecha) return;
+            const nuevaHora = prompt("Ingrese la nueva hora (HH:MM):", horaActual);
+            if (!nuevaHora) return;
+
+            const { error } = await _supabase.from('citas').update({ fecha: nuevaFecha, hora: nuevaHora }).eq('id', id);
+            if(error) alert("Error al modificar fecha/hora: " + error.message);
+            else { alert("¡Cita reprogramada por la administración!"); loadGlobalData(); }
+        }
+
+        async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
