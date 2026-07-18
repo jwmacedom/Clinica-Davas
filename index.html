@@ -275,9 +275,64 @@
         }
 
         // --- AQUÍ CONECTAREMOS SUPABASE EN EL SIGUIENTE PASO ---
-        const SUPABASE_URL = "https://TU-PROYECTO.supabase.co";
-        const SUPABASE_ANON_KEY = "TU-CLAVE-ANON";
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // Animación de giro de la tarjeta
+function toggleCard() {
+    document.getElementById('cyberCard').classList.toggle('flipped');
+}
+
+// ==========================================
+// CONFIGURACIÓN DE SUPABASE
+// ==========================================
+const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; // Tu URL de la imagen
+const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; // Reemplázala por tu clave Anon de Supabase
+
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Escuchador del formulario de login
+document.getElementById('loginForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const btnSubmit = e.target.querySelector('.btn-submit');
+    
+    btnSubmit.innerText = "CONECTANDO...";
+    btnSubmit.disabled = true;
+
+    // 1. Intentar iniciar sesión
+    const { data, error } = await _supabase.auth.signInWithPassword({
+        email: email,
+        password: password,
+    });
+
+    if (error) {
+        alert("ERROR_DE_ACCESO: " + error.message);
+        btnSubmit.innerText = "CONECTAR";
+        btnSubmit.disabled = false;
+        return;
+    }
+
+    // 2. Buscar el rol en la tabla 'perfiles'
+    const { data: perfil, error: perfilError } = await _supabase
+        .from('perfiles')
+        .select('rol')
+        .eq('id', data.user.id)
+        .single();
+
+    if (perfilError || !perfil) {
+        alert("ERROR_SISTEMA: No se encontró un rol asignado en la tabla perfiles.");
+        btnSubmit.innerText = "CONECTAR";
+        btnSubmit.disabled = false;
+        return;
+    }
+
+    // 3. Redireccionar según el rol
+    if (perfil.rol === 'admin') {
+        window.location.href = 'admin.html';
+    } else {
+        window.location.href = 'paciente.html';
+    }
+});
     </script>
 </body>
 </html>
