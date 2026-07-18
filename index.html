@@ -164,7 +164,7 @@
                     <form id="registerForm">
                         <div class="input-group"><input type="text" id="regName" placeholder="NOMBRE_COMPLETO" required></div>
                         <div class="input-group"><input type="email" id="regEmail" placeholder="CORREO_ELECTRÓNICO" required></div>
-                        <div class="input-group"><input type="password" id="regPassword" placeholder="CREAR_CONTRASENA (Min 6)" required></div>
+                        <div class="input-group"><input type="password" id="regPassword" placeholder="CONTRASENA (Min. 6 caracteres)" minlength="6" required></div>
                         <div class="login-actions">
                             <button type="button" class="btn-cancel" onclick="closeCard()">VOLVER</button>
                             <button type="submit" class="btn-submit" style="background: linear-gradient(90deg, #10b981, var(--neon-green));">CREAR_CUENTA</button>
@@ -243,8 +243,9 @@
     </div>
 
     <script>
+        // CONFIGURACIÓN DE RED ASIGNADA AUTOMÁTICAMENTE
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
-        const SUPABASE_ANON_KEY = "PEGA_AQUÍ_TU_NUEVA_PUBLISHABLE_KEY_AQUÍ"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_19dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function openForm(type) {
@@ -280,7 +281,7 @@
             else window.location.replace('paciente.html');
         });
 
-        // NUEVA LÓGICA DE REGISTRO AUTOMÁTICO DE PACIENTES
+        // LÓGICA DE REGISTRO AUTOMÁTICO DE PACIENTES
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value;
