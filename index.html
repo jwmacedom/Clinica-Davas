@@ -3,158 +3,201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DaVas | Neo-Clínica Dental</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <title>DaVas | Neo-Clínica Dental Avanzada</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #0a0f1d;
-            --panel-bg: rgba(17, 24, 39, 0.7);
+            --bg-color: #060913;
+            --panel-bg: rgba(15, 23, 42, 0.8);
             --neon-cyan: #00f3ff;
             --neon-blue: #0066ff;
-            --text-color: #e2e8f0;
-            --text-muted: #94a3b8;
+            --text-color: #f1f5f9;
+            --text-muted: #64748b;
+            --neon-green: #39ff14;
         }
 
         body {
             margin: 0; padding: 0; background-color: var(--bg-color); color: var(--text-color);
             font-family: 'Rajdhani', sans-serif; display: flex; flex-direction: column; min-height: 100vh;
+            background-image: radial-gradient(circle at 50% 20%, #0f172a 0%, #060913 70%);
         }
 
         header {
             display: flex; justify-content: space-between; align-items: center; padding: 20px 50px;
-            border-bottom: 1px solid rgba(0, 243, 255, 0.2); background: rgba(10, 15, 29, 0.8); backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 243, 255, 0.15); background: rgba(6, 9, 19, 0.8); backdrop-filter: blur(12px);
+            position: sticky; top: 0; z-index: 100;
         }
 
         header h1 {
-            font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--neon-cyan); letter-spacing: 2px; margin: 0;
-            text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+            font-family: 'Orbitron', sans-serif; font-size: 26px; color: var(--neon-cyan); letter-spacing: 3px; margin: 0;
+            text-shadow: 0 0 15px rgba(0, 243, 255, 0.6);
         }
 
         .social-links a {
-            color: var(--text-muted); text-decoration: none; font-weight: bold; transition: 0.3s;
+            color: var(--text-muted); text-decoration: none; font-weight: 700; transition: 0.3s; font-size: 14px; letter-spacing: 1px;
         }
         .social-links a:hover { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
 
         .hero-section {
-            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; perspective: 1200px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 50px 20px; perspective: 1500px;
         }
 
+        /* Sistema de Tarjeta Avanzada */
         .card-wrapper {
-            width: 450px; height: 280px; position: relative; transform-style: preserve-3d;
-            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: 40px;
+            width: 480px; height: 340px; position: relative; transform-style: preserve-3d;
+            transition: transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1); margin-bottom: 20px;
         }
         .card-wrapper.flipped { transform: rotateY(180deg); }
+        
         .card-face {
-            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 16px;
-            border: 2px solid rgba(0, 243, 255, 0.3); box-shadow: 0 0 30px rgba(0, 102, 255, 0.2); padding: 30px; box-sizing: border-box;
-            display: flex; flex-direction: column; justify-content: space-between;
+            position: absolute; width: 100%; height: 100%; backface-visibility: hidden; border-radius: 20px;
+            border: 1px solid rgba(0, 243, 255, 0.25); box-shadow: 0 0 40px rgba(0, 102, 255, 0.15); padding: 35px; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: space-between; background: linear-gradient(135deg, #0f172a 0%, #05070f 100%);
         }
-        .card-front { background: linear-gradient(135deg, #111827 0%, #0f172a 100%); }
+        
         .logo-area h2 {
-            font-family: 'Orbitron', sans-serif; margin: 0; font-size: 28px;
+            font-family: 'Orbitron', sans-serif; margin: 0; font-size: 32px;
             background: linear-gradient(to right, #00f3ff, #0066ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 20px rgba(0, 243, 255, 0.1);
         }
-        .chip { width: 40px; height: 30px; background: linear-gradient(135deg, #22d3ee 0%, #0284c7 100%); border-radius: 4px; opacity: 0.7; }
+        
+        .chip { width: 45px; height: 32px; background: linear-gradient(135deg, #00f3ff 0%, #0066ff 100%); border-radius: 6px; opacity: 0.8; box-shadow: 0 0 10px rgba(0,243,255,0.4); }
+        
         .btn-neon {
-            background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 10px 20px;
-            font-family: 'Orbitron', sans-serif; font-size: 12px; border-radius: 4px; cursor: pointer; transition: all 0.3s;
+            background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 12px 24px;
+            font-family: 'Orbitron', sans-serif; font-size: 13px; border-radius: 6px; cursor: pointer; transition: all 0.3s; font-weight: bold;
         }
-        .btn-neon:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 20px var(--neon-cyan); }
-        .card-back { background: linear-gradient(135deg, #0f172a 0%, #020617 100%); transform: rotateY(180deg); }
-        .input-group input {
-            width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 243, 255, 0.2); padding: 10px;
-            border-radius: 4px; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 16px; box-sizing: border-box; margin-bottom: 12px;
-        }
-        .login-actions { display: flex; justify-content: space-between; gap: 10px; }
-        .btn-submit { flex: 1; background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); border: none; color: white; padding: 10px; font-family: 'Orbitron', sans-serif; border-radius: 4px; cursor: pointer; }
-        .btn-cancel { background: transparent; border: 1px solid #64748b; color: #64748b; padding: 10px; font-family: 'Orbitron', sans-serif; border-radius: 4px; cursor: pointer; }
+        .btn-neon:hover { background: var(--neon-cyan); color: #000; box-shadow: 0 0 25px var(--neon-cyan); }
+        
+        .card-back { transform: rotateY(180deg); }
+        
+        /* Formularios Mutables Internos */
+        .form-container { display: none; height: 100%; flex-direction: column; justify-content: center; }
+        .form-container.active { display: flex; }
 
-        .info-container { max-width: 1100px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 1fr; gap: 50px; }
+        .input-group input {
+            width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(0, 243, 255, 0.2); padding: 11px;
+            border-radius: 6px; color: #fff; font-family: 'Rajdhani', sans-serif; font-size: 16px; box-sizing: border-box; margin-bottom: 10px;
+            transition: 0.3s;
+        }
+        .input-group input:focus { border-color: var(--neon-cyan); outline: none; box-shadow: 0 0 10px rgba(0,243,255,0.2); }
+        
+        .login-actions { display: flex; justify-content: space-between; gap: 10px; margin-top: 5px; }
+        .btn-submit { flex: 1; background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); border: none; color: white; padding: 11px; font-family: 'Orbitron', sans-serif; font-size: 13px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .btn-submit:hover { box-shadow: 0 0 15px var(--neon-cyan); }
+        .btn-cancel { background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 11px; font-family: 'Orbitron', sans-serif; font-size: 13px; border-radius: 6px; cursor: pointer; }
+
+        /* Estilo Comercial Avanzado */
+        .info-container { max-width: 1200px; margin: 0 auto; padding: 40px 20px; display: grid; grid-template-columns: 1fr; gap: 60px; }
         .section-title {
-            font-family: 'Orbitron', sans-serif; font-size: 22px; color: var(--neon-cyan); border-left: 4px solid var(--neon-blue);
-            padding-left: 15px; margin-bottom: 25px; text-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
+            font-family: 'Orbitron', sans-serif; font-size: 24px; color: var(--neon-cyan); border-left: 5px solid var(--neon-blue);
+            padding-left: 18px; margin-bottom: 30px; text-shadow: 0 0 10px rgba(0, 243, 255, 0.2); letter-spacing: 1px;
         }
-        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
+        .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
         .showcase-card {
-            background: var(--panel-bg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 25px;
-            transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between;
+            background: var(--panel-bg); border: 1px solid rgba(0, 243, 255, 0.1); border-radius: 16px; padding: 30px;
+            transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between; backdrop-filter: blur(5px);
         }
-        .showcase-card:hover { border-color: var(--neon-cyan); transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0, 243, 255, 0.1); }
-        .showcase-card h4 { font-family: 'Orbitron', sans-serif; margin: 0 0 10px 0; font-size: 18px; color: #fff; }
-        .price-tag { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); font-size: 20px; margin-top: 15px; font-weight: bold; }
-        .location-box { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; background: var(--panel-bg); padding: 30px; border-radius: 12px; border: 1px solid rgba(0, 102, 255, 0.2); }
+        .showcase-card:hover { border-color: var(--neon-cyan); transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0, 243, 255, 0.15); }
+        .showcase-card h4 { font-family: 'Orbitron', sans-serif; margin: 0 0 12px 0; font-size: 20px; color: #fff; letter-spacing: 0.5px; }
+        .price-tag { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); font-size: 22px; margin-top: 20px; font-weight: 700; text-shadow: 0 0 5px rgba(0,243,255,0.3); }
+
+        .location-box { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: var(--panel-bg); padding: 35px; border-radius: 16px; border: 1px solid rgba(0, 102, 255, 0.2); }
         @media (max-width: 768px) { .location-box { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>DAVAS // DENTAL_SYSTEM</h1>
-        <div class="social-links" style="display: flex; align-items: center; gap: 15px;">
+        <h1>DAVAS // DENTAL_CLINIC</h1>
+        <div class="social-links" style="display: flex; align-items: center; gap: 20px;">
             <a href="https://facebook.com" target="_blank">FACEBOOK</a>
             <a href="https://instagram.com" target="_blank">INSTAGRAM</a>
             <a href="https://whatsapp.com" target="_blank">WHATSAPP</a>
-            <button onclick="limpiezaFuerzaBruta()" style="background: #ff0055; color: white; border: none; padding: 5px 10px; font-family: 'Orbitron'; cursor: pointer; border-radius: 4px; font-size: 11px;">LIMPIAR_SESION</button>
+            <button onclick="limpiezaFuerzaBruta()" style="background: #ff0055; color: white; border: none; padding: 6px 12px; font-family: 'Orbitron'; cursor: pointer; border-radius: 5px; font-size: 11px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,85,0.3);">LIMPIAR_SESION</button>
         </div>
     </header>
 
     <div class="hero-section">
         <div class="card-wrapper" id="cyberCard">
+            <!-- CARA FRONT: Tarjeta de Acceso Corporativo -->
             <div class="card-face card-front">
-                <div class="card-header">
+                <div class="card-header" style="display:flex; justify-content:space-between; align-items:flex-start;">
                     <div class="logo-area">
                         <h2>DaVas</h2>
-                        <p>CLÍNICA ODONTOLÓGICA</p>
+                        <p style="margin:5px 0 0 0; color:var(--text-muted); font-weight:600; letter-spacing:2px; font-size:14px;">ODONTOLOGÍA DE PRECISIÓN</p>
                     </div>
                     <div class="chip"></div>
                 </div>
-                <div class="card-footer">
-                    <div style="font-size:13px; color:var(--text-muted); line-height:1.4;">
-                        SYSTEM: PORTAL_RESERVAS_v2.0<br>
-                        OPERATIVO: 24/7 ONLINE<br>
-                        ACCESO: SEGURO HÍBRIDO
+                <div class="card-footer" style="display:flex; justify-content:space-between; align-items:flex-end;">
+                    <div style="font-size:13px; color:var(--text-muted); line-height:1.5; font-weight:500;">
+                        PORTAL: GESTIÓN_MÉDICA_v3.0<br>
+                        ESTADO: OPERATIVO EN RED<br>
+                        SEGURIDAD: ENCRIPTACIÓN END-TO-END
                     </div>
-                    <button class="btn-neon" onclick="toggleCard()">SACAR CITA</button>
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <button class="btn-neon" onclick="openForm('login')">INGRESAR</button>
+                        <button style="background:transparent; border:none; color:var(--text-muted); font-family:'Orbitron'; cursor:pointer; font-size:11px; text-decoration:underline;" onclick="openForm('register')">REGISTRARSE</button>
+                    </div>
                 </div>
             </div>
 
+            <!-- CARA BACK: Formularios Interactivos Mutables -->
             <div class="card-face card-back">
-                <h3 style="font-family:'Orbitron'; margin:0 0 15px 0; color:var(--neon-cyan); text-align:center;">SECURE_LOGIN</h3>
-                <form id="loginForm">
-                    <div class="input-group"><input type="email" id="email" placeholder="CORREO_ELECTRÓNICO" required></div>
-                    <div class="input-group"><input type="password" id="password" placeholder="PASSWORD" required></div>
-                    <div class="login-actions">
-                        <button type="button" class="btn-cancel" onclick="toggleCard()">VOLVER</button>
-                        <button type="submit" class="btn-submit">CONECTAR</button>
-                    </div>
-                </form>
+                <!-- FORMULARIO 1: INICIAR SESIÓN -->
+                <div id="loginFormContainer" class="form-container">
+                    <h3 style="font-family:'Orbitron'; margin:0 0 18px 0; color:var(--neon-cyan); text-align:center; letter-spacing:1px;">SECURE_LOGIN</h3>
+                    <form id="loginForm">
+                        <div class="input-group"><input type="email" id="email" placeholder="CORREO_ELECTRÓNICO" required></div>
+                        <div class="input-group"><input type="password" id="password" placeholder="PASSWORD" required></div>
+                        <div class="login-actions">
+                            <button type="button" class="btn-cancel" onclick="closeCard()">VOLVER</button>
+                            <button type="submit" class="btn-submit">CONECTAR</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- FORMULARIO 2: REGISTRO DE PACIENTES -->
+                <div id="registerFormContainer" class="form-container">
+                    <h3 style="font-family:'Orbitron'; margin:0 0 15px 0; color:var(--neon-green); text-align:center; letter-spacing:1px;">NUEVO_REGISTRO</h3>
+                    <form id="registerForm">
+                        <div class="input-group"><input type="text" id="regName" placeholder="NOMBRE_COMPLETO" required></div>
+                        <div class="input-group"><input type="email" id="regEmail" placeholder="CORREO_ELECTRÓNICO" required></div>
+                        <div class="input-group"><input type="password" id="regPassword" placeholder="CREAR_CONTRASENA (Min 6)" required></div>
+                        <div class="login-actions">
+                            <button type="button" class="btn-cancel" onclick="closeCard()">VOLVER</button>
+                            <button type="submit" class="btn-submit" style="background: linear-gradient(90deg, #10b981, var(--neon-green));">CREAR_CUENTA</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
+    <!-- SECCIONES DE INFORMACIÓN COMERCIAL -->
     <div class="info-container">
         <section>
             <div class="section-title">PROCEDIMIENTOS_Y_SERVICIOS</div>
             <div class="grid-cards">
                 <div class="showcase-card">
                     <div>
-                        <h4>Limpieza Ultra-Dental</h4>
-                        <p style="color:var(--text-muted); margin:0;">Remoción avanzada de sarro y pulido dental con tecnología ultrasónica indolora.</p>
+                        <h4>Limpieza Ultra-Dental Indolora</h4>
+                        <p style="color:var(--text-muted); margin:0; line-height:1.5;">Remoción profunda de sarro y biofilm dental mediante tecnología ultrasónica avanzada y pulido de micropartículas.</p>
                     </div>
                     <div class="price-tag">S/ 80</div>
                 </div>
                 <div class="showcase-card">
                     <div>
                         <h4>Carillas de Resina Estética</h4>
-                        <p style="color:var(--text-muted); margin:0;">Diseño de sonrisa de alta precisión para restaurar simetría y color natural.</p>
+                        <p style="color:var(--text-muted); margin:0; line-height:1.5;">Diseño de sonrisa personalizado de alta definición. Reconstrucción estética para restaurar la simetría y blancura ideal.</p>
                     </div>
                     <div class="price-tag">S/ 500</div>
                 </div>
                 <div class="showcase-card">
                     <div>
                         <h4>Implante Dental Bio-Compatible</h4>
-                        <p style="color:var(--text-muted); margin:0;">Sustitución de piezas perdidas con titanio quirúrgico de alta durabilidad.</p>
+                        <p style="color:var(--text-muted); margin:0; line-height:1.5;">Reemplazo de piezas perdidas mediante pernos de titanio quirúrgico de alta pureza médica con corona de porcelana integrada.</p>
                     </div>
                     <div class="price-tag">S/ 1500</div>
                 </div>
@@ -166,15 +209,15 @@
             <div class="grid-cards">
                 <div class="showcase-card">
                     <div>
-                        <h4>Pasta Dental Regeneradora</h4>
-                        <p style="color:var(--text-muted); margin:0;">Fórmula especializada para fortalecer el esmalte y proteger encías sensibles.</p>
+                        <h4>Pasta Dental Regeneradora Avanzada</h4>
+                        <p style="color:var(--text-muted); margin:0; line-height:1.5;">Fórmula bio-activa de uso profesional diseñada para remineralizar el esmalte dental y blindar raíces sensibles contra estímulos térmicos.</p>
                     </div>
                     <div class="price-tag">S/ 10</div>
                 </div>
                 <div class="showcase-card">
                     <div>
-                        <h4>Crema de Regeneración Dérmica</h4>
-                        <p style="color:var(--text-muted); margin:0;">Tratamiento complementario para el cuidado y revitalización perioral.</p>
+                        <h4>Crema de Regeneración Dérmica Oral</h4>
+                        <p style="color:var(--text-muted); margin:0; line-height:1.5;">Tratamiento complementario clínico para revitalizar tejidos periorales, acelerar cicatrizaciones y mantener encías hidratadas.</p>
                     </div>
                     <div class="price-tag">S/ 500</div>
                 </div>
@@ -185,14 +228,14 @@
             <div class="section-title">UBICACIÓN_CENTRAL</div>
             <div class="location-box">
                 <div>
-                    <h4 style="font-family:'Orbitron'; margin:0 0 10px 0; color:#fff;">Clínica Central DaVas</h4>
-                    <p style="color:var(--text-muted); line-height:1.6; margin:0;">
-                        Nuestros laboratorios y consultorios están equipados con los estándares más altos del sector.<br><br>
-                        <strong>Dirección:</strong> Av. Central 456, Edificio Neo-Médica, Piso 3.<br>
-                        <strong>Atención:</strong> Lunes a Sábado de 8:00 AM a 8:00 PM
+                    <h4 style="font-family:'Orbitron'; margin:0 0 12px 0; color:#fff; font-size:18px;">Complejo Odontológico DaVas</h4>
+                    <p style="color:var(--text-muted); line-height:1.7; margin:0; font-size:15px;">
+                        Nuestros modernos gabinetes clínicos combinan aparatología quirúrgica de última generación con espacios confortables y seguros.<br><br>
+                        📍 <strong>Dirección:</strong> Av. Central 456, Edificio Neo-Médica, Piso 3.<br>
+                        ⏰ <strong>Horario de atención:</strong> Lunes a Sábado de 8:00 AM a 8:00 PM
                     </p>
                 </div>
-                <div style="border-radius:8px; overflow:hidden; border:1px solid rgba(0,243,255,0.2); background:#111; height:180px; display:flex; justify-content:center; align-items:center; color:var(--text-muted);">
+                <div style="border-radius:12px; overflow:hidden; border:1px solid rgba(0,243,255,0.2); background:#0b0f19; height:200px; display:flex; justify-content:center; align-items:center; color:var(--text-muted); font-size:14px; letter-spacing:1px; font-weight:600;">
                     [ MAPA_DE_GOOGLE_SIMULADO ]
                 </div>
             </div>
@@ -200,58 +243,62 @@
     </div>
 
     <script>
-        function toggleCard() { document.getElementById('cyberCard').classList.toggle('flipped'); }
-
-        // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
-
+        const SUPABASE_ANON_KEY = "PEGA_AQUÍ_TU_NUEVA_PUBLISHABLE_KEY_AQUÍ"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // BOTÓN DE RESET DE MEMORIA DIRECTO
-        async function limpiezaFuerzaBruta() {
-            try {
-                await _supabase.auth.signOut();
-                localStorage.clear();
-                sessionStorage.clear();
-                alert("MEMORIA_LIMPIADA: Sesión destruida con éxito.");
-                window.location.reload();
-            } catch (err) {
-                localStorage.clear();
-                window.location.reload();
-            }
+        function openForm(type) {
+            document.getElementById('loginFormContainer').classList.remove('active');
+            document.getElementById('registerFormContainer').classList.remove('active');
+            
+            if(type === 'login') document.getElementById('loginFormContainer').classList.add('active');
+            if(type === 'register') document.getElementById('registerFormContainer').classList.add('active');
+            
+            document.getElementById('cyberCard').classList.add('flipped');
         }
 
-        // CONTROL DE FORMULARIO CORREGIDO
+        function closeCard() { document.getElementById('cyberCard').classList.remove('flipped'); }
+
+        async function limpiezaFuerzaBruta() {
+            await _supabase.auth.signOut(); localStorage.clear(); sessionStorage.clear();
+            alert("SISTEMA_REINICIADO: Memoria temporal purgada."); window.location.reload();
+        }
+
+        // LÓGICA DE LOGIN
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const btnSubmit = e.target.querySelector('.btn-submit');
-            
-            btnSubmit.innerText = "CONECTANDO...";
-            btnSubmit.disabled = true;
+            const btn = e.target.querySelector('.btn-submit');
+            btn.innerText = "VERIFICANDO..."; btn.disabled = true;
 
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+            if (error) { alert("ERROR: " + error.message); btn.innerText = "CONECTAR"; btn.disabled = false; return; }
 
-            if (error) {
-                alert("ERROR_DE_ACCESO: " + error.message);
-                btnSubmit.innerText = "CONECTAR"; btnSubmit.disabled = false; return;
-            }
+            const { data: perfil } = await _supabase.from('perfiles').select('rol').eq('id', data.user.id).single();
+            if (perfil && perfil.rol === 'admin') window.location.replace('admin.html');
+            else window.location.replace('paciente.html');
+        });
 
-            const { data: perfil, error: perfilError } = await _supabase
-                .from('perfiles').select('rol').eq('id', data.user.id).single();
+        // NUEVA LÓGICA DE REGISTRO AUTOMÁTICO DE PACIENTES
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const btn = e.target.querySelector('.btn-submit');
+            btn.innerText = "CREANDO..."; btn.disabled = true;
 
-            if (perfilError || !perfil) {
-                alert("ERROR: No se encontró un rol válido en la tabla de perfiles.");
-                btnSubmit.innerText = "CONECTAR"; btnSubmit.disabled = false; return;
-            }
+            // 1. Crear usuario en la autenticación de Supabase
+            const { data, error } = await _supabase.auth.signUp({ email, password });
+            if (error) { alert("Error al registrar: " + error.message); btn.innerText = "CREAR_CUENTA"; btn.disabled = false; return; }
 
-            // Redirección forzada limpia
-            if (perfil.rol === 'admin') { 
-                window.location.replace('admin.html'); 
-            } else { 
-                window.location.replace('paciente.html'); 
+            if(data.user) {
+                // 2. Insertar automáticamente su perfil como 'paciente'
+                await _supabase.from('perfiles').insert([{ id: data.user.id, nombre: name, rol: 'paciente' }]);
+                alert("¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.");
+                e.target.reset();
+                openForm('login');
             }
         });
     </script>
