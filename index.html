@@ -32,7 +32,7 @@
         }
 
         .social-links a {
-            color: var(--text-muted); text-decoration: none; margin-left: 15px; font-weight: bold; transition: 0.3s;
+            color: var(--text-muted); text-decoration: none; font-weight: bold; transition: 0.3s;
         }
         .social-links a:hover { color: var(--neon-cyan); text-shadow: 0 0 8px var(--neon-cyan); }
 
@@ -95,7 +95,6 @@
             <a href="https://facebook.com" target="_blank">FACEBOOK</a>
             <a href="https://instagram.com" target="_blank">INSTAGRAM</a>
             <a href="https://whatsapp.com" target="_blank">WHATSAPP</a>
-            <!-- BOTÓN DE EMERGENCIA PARA BORRAR LA SESIÓN PEGADA -->
             <button onclick="limpiezaFuerzaBruta()" style="background: #ff0055; color: white; border: none; padding: 5px 10px; font-family: 'Orbitron'; cursor: pointer; border-radius: 4px; font-size: 11px;">LIMPIAR_SESION</button>
         </div>
     </header>
@@ -209,7 +208,21 @@
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // LÓGICA DE INICIO DE SESIÓN LIMPIA
+        // BOTÓN DE RESET DE MEMORIA DIRECTO
+        async function limpiezaFuerzaBruta() {
+            try {
+                await _supabase.auth.signOut();
+                localStorage.clear();
+                sessionStorage.clear();
+                alert("MEMORIA_LIMPIADA: Sesión destruida con éxito.");
+                window.location.reload();
+            } catch (err) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        // CONTROL DE FORMULARIO CORREGIDO
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -219,7 +232,6 @@
             btnSubmit.innerText = "CONECTANDO...";
             btnSubmit.disabled = true;
 
-            // 1. Validar usuario en Supabase
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
@@ -227,35 +239,21 @@
                 btnSubmit.innerText = "CONECTAR"; btnSubmit.disabled = false; return;
             }
 
-            // 2. Buscar rol sin usar listeners reactivos en esta vista
             const { data: perfil, error: perfilError } = await _supabase
                 .from('perfiles').select('rol').eq('id', data.user.id).single();
 
             if (perfilError || !perfil) {
-                alert("ERROR: No se encontró perfil configurado en la base de datos.");
+                alert("ERROR: No se encontró un rol válido en la tabla de perfiles.");
                 btnSubmit.innerText = "CONECTAR"; btnSubmit.disabled = false; return;
             }
 
-            // 3. Redirección forzada e inmediata
-            if (perfil.role === 'admin' || perfil.rol === 'admin') { 
+            // Redirección forzada limpia
+            if (perfil.rol === 'admin') { 
                 window.location.replace('admin.html'); 
             } else { 
                 window.location.replace('paciente.html'); 
             }
         });
-
-        async function limpiezaFuerzaBruta() {
-    // 1. Forzar a Supabase a cerrar la sesión
-    await _supabase.auth.signOut();
-    
-    // 2. Limpiar la memoria local del navegador manualmente
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    alert("MEMORIA_LIMPIADA: Sesión destruida con éxito.");
-    
-    // 3. Recargar la página totalmente limpia
-    window.location.reload();
     </script>
 </body>
 </html>
