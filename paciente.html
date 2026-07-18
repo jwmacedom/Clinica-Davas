@@ -131,7 +131,16 @@
             }
         });
 
-        async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
+        async function logout() {
+  // Primero le decimos a Supabase que limpie la sesión en el navegador
+  const { error } = await _supabase.auth.signOut();
+  if (error) {
+    alert("Error al cerrar sesión: " + error.message);
+  } else {
+    // Solo cuando se borró con éxito, nos movemos de página
+    window.location.href = 'index.html';
+  }
+}
     </script>
 </body>
 </html>
