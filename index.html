@@ -31,7 +31,6 @@
             text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
         }
 
-        /* Redes Sociales en Header */
         .social-links a {
             color: var(--text-muted); text-decoration: none; margin-left: 15px; font-weight: bold; transition: 0.3s;
         }
@@ -41,7 +40,6 @@
             display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; perspective: 1200px;
         }
 
-        /* Contenedor de la Tarjeta 3D */
         .card-wrapper {
             width: 450px; height: 280px; position: relative; transform-style: preserve-3d;
             transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); margin-bottom: 40px;
@@ -72,16 +70,12 @@
         .btn-submit { flex: 1; background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); border: none; color: white; padding: 10px; font-family: 'Orbitron', sans-serif; border-radius: 4px; cursor: pointer; }
         .btn-cancel { background: transparent; border: 1px solid #64748b; color: #64748b; padding: 10px; font-family: 'Orbitron', sans-serif; border-radius: 4px; cursor: pointer; }
 
-        /* SECCIONES COMERCIALES INYECTADAS */
         .info-container { max-width: 1100px; margin: 0 auto; padding: 20px; display: grid; grid-template-columns: 1fr; gap: 50px; }
-        
         .section-title {
             font-family: 'Orbitron', sans-serif; font-size: 22px; color: var(--neon-cyan); border-left: 4px solid var(--neon-blue);
             padding-left: 15px; margin-bottom: 25px; text-shadow: 0 0 8px rgba(0, 243, 255, 0.3);
         }
-
         .grid-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
-        
         .showcase-card {
             background: var(--panel-bg); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 25px;
             transition: 0.3s; display: flex; flex-direction: column; justify-content: space-between;
@@ -89,11 +83,7 @@
         .showcase-card:hover { border-color: var(--neon-cyan); transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0, 243, 255, 0.1); }
         .showcase-card h4 { font-family: 'Orbitron', sans-serif; margin: 0 0 10px 0; font-size: 18px; color: #fff; }
         .price-tag { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); font-size: 20px; margin-top: 15px; font-weight: bold; }
-
-        .location-box {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 30px; background: var(--panel-bg); padding: 30px; border-radius: 12px;
-            border: 1px solid rgba(0, 102, 255, 0.2);
-        }
+        .location-box { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; background: var(--panel-bg); padding: 30px; border-radius: 12px; border: 1px solid rgba(0, 102, 255, 0.2); }
         @media (max-width: 768px) { .location-box { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -108,19 +98,17 @@
         </div>
     </header>
 
-    <!-- ZONA CENTRAL: TARJETA DE PRESENTACIÓN 3D -->
     <div class="hero-section">
         <div class="card-wrapper" id="cyberCard">
-            <!-- CARA FRONT: Tarjeta de Presentación -->
             <div class="card-face card-front">
-                <div class="card-header" style="display:flex; justify-content:space-between;">
+                <div class="card-header">
                     <div class="logo-area">
                         <h2>DaVas</h2>
                         <p>CLÍNICA ODONTOLÓGICA</p>
                     </div>
                     <div class="chip"></div>
                 </div>
-                <div class="card-footer" style="display:flex; justify-content:space-between; align-items:flex-end;">
+                <div class="card-footer">
                     <div style="font-size:13px; color:var(--text-muted); line-height:1.4;">
                         SYSTEM: PORTAL_RESERVAS_v2.0<br>
                         OPERATIVO: 24/7 ONLINE<br>
@@ -130,7 +118,6 @@
                 </div>
             </div>
 
-            <!-- CARA BACK: Formulario Login -->
             <div class="card-face card-back">
                 <h3 style="font-family:'Orbitron'; margin:0 0 15px 0; color:var(--neon-cyan); text-align:center;">SECURE_LOGIN</h3>
                 <form id="loginForm">
@@ -145,10 +132,7 @@
         </div>
     </div>
 
-    <!-- SECCIONES DE INFORMACIÓN COMERCIAL -->
     <div class="info-container">
-        
-        <!-- SECCIÓN 1: PROCEDIMIENTOS Y SERVICIOS -->
         <section>
             <div class="section-title">PROCEDIMIENTOS_Y_SERVICIOS</div>
             <div class="grid-cards">
@@ -176,7 +160,6 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 2: PRODUCTOS A LA VENTA -->
         <section>
             <div class="section-title">PRODUCTOS_DISPONIBLES</div>
             <div class="grid-cards">
@@ -197,7 +180,6 @@
             </div>
         </section>
 
-        <!-- SECCIÓN 3: UBICACIÓN -->
         <section style="margin-bottom: 50px;">
             <div class="section-title">UBICACIÓN_CENTRAL</div>
             <div class="location-box">
@@ -210,11 +192,10 @@
                     </p>
                 </div>
                 <div style="border-radius:8px; overflow:hidden; border:1px solid rgba(0,243,255,0.2); background:#111; height:180px; display:flex; justify-content:center; align-items:center; color:var(--text-muted);">
-                    [ MAPA_DE_GOOGLE_SIMULADO / REEMPLAZAR_CON_IFRAME ]
+                    [ MAPA_DE_GOOGLE_SIMULADO ]
                 </div>
             </div>
         </section>
-
     </div>
 
     <script>
@@ -222,10 +203,11 @@
 
         // CONFIGURACIÓN DE SUPABASE
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
-        const SUPABASE_ANON_KEY = "TU_CLAVE_ANON_REAL_AQUI"; // REEMPLAZA ESTO CON TU CLAVE ANON DE SUPABASE
+        const SUPABASE_ANON_KEY = "AGREGA_AQUI_TU_CLAVE_ANON_REAL_DE_SUPABASE"; 
 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // LÓGICA DE INICIO DE SESIÓN LIMPIA
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -235,6 +217,7 @@
             btnSubmit.innerText = "CONECTANDO...";
             btnSubmit.disabled = true;
 
+            // 1. Validar usuario en Supabase
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
@@ -242,16 +225,21 @@
                 btnSubmit.innerText = "CONECTAR"; btnSubmit.disabled = false; return;
             }
 
+            // 2. Buscar rol sin usar listeners reactivos en esta vista
             const { data: perfil, error: perfilError } = await _supabase
                 .from('perfiles').select('rol').eq('id', data.user.id).single();
 
             if (perfilError || !perfil) {
-                alert("ERROR_SISTEMA: No se encontró perfil configurado.");
+                alert("ERROR: No se encontró perfil configurado en la base de datos.");
                 btnSubmit.innerText = "CONECTAR"; btnSubmit.disabled = false; return;
             }
 
-            if (perfil.rol === 'admin') { window.location.href = 'admin.html'; } 
-            else { window.location.href = 'paciente.html'; }
+            // 3. Redirección forzada e inmediata
+            if (perfil.role === 'admin' || perfil.rol === 'admin') { 
+                window.location.replace('admin.html'); 
+            } else { 
+                window.location.replace('paciente.html'); 
+            }
         });
     </script>
 </body>
