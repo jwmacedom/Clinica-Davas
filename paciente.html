@@ -3,85 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DaVas | Portal Paciente</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <title>DaVas | Portal Paciente Profesional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
-            --bg-color: #0a0f1d;
+            --bg-color: #060913;
+            --panel-bg: rgba(15, 23, 42, 0.7);
             --neon-cyan: #00f3ff;
+            --neon-blue: #0066ff;
             --neon-green: #39ff14;
-            --text-color: #e2e8f0;
+            --neon-red: #ff0055;
+            --text-color: #f1f5f9;
+            --text-muted: #64748b;
         }
-        body {
-            margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif;
-        }
-        header {
-            display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; border-bottom: 1px solid rgba(0, 243, 255, 0.2); background: rgba(10, 15, 29, 0.9);
-        }
-        header h1 { font-family: 'Orbitron', sans-serif; font-size: 20px; color: var(--neon-cyan); margin: 0; }
-        .btn-disconnect { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 8px 15px; font-family: 'Orbitron', sans-serif; font-size: 11px; cursor: pointer; border-radius: 4px; transition: 0.3s; }
-        .btn-disconnect:hover { background: #ff0055; color: #000; box-shadow: 0 0 15px #ff0055; }
+        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; background-image: radial-gradient(circle at 50% 20%, #0f172a 0%, #060913 70%); min-height: 100vh; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; border-bottom: 1px solid rgba(0, 243, 255, 0.15); background: rgba(6, 9, 19, 0.8); backdrop-filter: blur(10px); }
+        header h1 { font-family: 'Orbitron', sans-serif; font-size: 20px; color: var(--neon-cyan); margin: 0; text-shadow: 0 0 10px rgba(0, 243, 255, 0.4); }
         
-        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 40px; max-width: 1200px; margin: 0 auto; }
-        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
-        .panel-box { background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(0, 243, 255, 0.15); border-radius: 12px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
-        .panel-box h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); margin-top: 0; border-bottom: 1px dashed rgba(0, 243, 255, 0.2); padding-bottom: 10px; }
+        .btn-disconnect { background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); padding: 8px 16px; font-family: 'Orbitron', sans-serif; font-size: 11px; cursor: pointer; border-radius: 5px; font-weight: bold; transition: 0.3s; }
+        .btn-disconnect:hover { background: var(--neon-red); color: #000; box-shadow: 0 0 15px var(--neon-red); }
         
-        .input-cyber { width: 100%; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(0, 243, 255, 0.2); padding: 12px; border-radius: 6px; color: white; font-family: 'Rajdhani', sans-serif; font-size: 16px; box-sizing: border-box; margin-bottom: 15px; }
+        .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 30px; padding: 40px; max-width: 1400px; margin: 0 auto; }
+        @media (max-width: 968px) { .dashboard { grid-template-columns: 1fr; } }
+        
+        .panel-box { background: var(--panel-bg); border: 1px solid rgba(0, 243, 255, 0.15); border-radius: 16px; padding: 30px; backdrop-filter: blur(5px); display: flex; flex-direction: column; justify-content: flex-start; }
+        .panel-box h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); margin-top: 0; border-bottom: 1px dashed rgba(0, 243, 255, 0.2); padding-bottom: 12px; font-size: 18px; letter-spacing: 1px; }
+        
+        .input-cyber { width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(0, 243, 255, 0.2); padding: 12px; border-radius: 6px; color: white; font-family: 'Rajdhani', sans-serif; font-size: 16px; box-sizing: border-box; margin-bottom: 15px; transition: 0.3s; }
         .input-cyber:focus { outline: none; border-color: var(--neon-cyan); box-shadow: 0 0 10px rgba(0, 243, 255, 0.2); }
         
-        .btn-cyber { width: 100%; background: linear-gradient(90deg, #0066ff, var(--neon-cyan)); border: none; color: white; padding: 12px; font-family: 'Orbitron', sans-serif; border-radius: 6px; cursor: pointer; font-size: 13px; letter-spacing: 1px; transition: 0.3s; }
+        .btn-cyber { width: 100%; background: linear-gradient(90deg, var(--neon-blue), var(--neon-cyan)); border: none; color: white; padding: 12px; font-family: 'Orbitron', sans-serif; border-radius: 6px; cursor: pointer; font-size: 13px; letter-spacing: 1px; font-weight: bold; transition: 0.3s; }
         .btn-cyber:hover { box-shadow: 0 0 20px var(--neon-cyan); }
         
-        .appointment-card { background: rgba(255, 255, 255, 0.02); border-left: 4px solid var(--neon-green); padding: 15px; margin-bottom: 12px; border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; }
-        .status-badge { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-family: 'Orbitron', sans-serif; }
+        .appointment-card { background: rgba(255, 255, 255, 0.02); border-left: 4px solid var(--neon-blue); padding: 20px; margin-bottom: 15px; border-radius: 0 12px 12px 0; border-top: 1px solid rgba(255,255,255,0.02); border-right: 1px solid rgba(255,255,255,0.02); border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .card-header-info { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .status-badge { padding: 4px 10px; border-radius: 5px; font-size: 11px; font-family: 'Orbitron', sans-serif; font-weight: bold; text-transform: uppercase; }
+        .status-pendiente { background: rgba(255, 234, 0, 0.1); color: #ffea00; }
+        .status-aprobada { background: rgba(0, 102, 255, 0.1); color: var(--neon-cyan); }
+        .status-completada { background: rgba(57, 255, 20, 0.1); color: var(--neon-green); }
+        .status-cancelada { background: rgba(255, 0, 85, 0.1); color: var(--neon-red); }
+        
+        .actions-area { display: flex; gap: 10px; justify-content: flex-end; }
+        .btn-action { font-family: 'Orbitron', sans-serif; font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; background: transparent; transition: 0.3s; }
+        .btn-edit { border: 1px solid #ffea00; color: #ffea00; }
+        .btn-edit:hover { background: #ffea00; color: #000; }
+        .btn-cancel-cita { border: 1px solid var(--neon-red); color: var(--neon-red); }
+        .btn-cancel-cita:hover { background: var(--neon-red); color: #000; box-shadow: 0 0 10px var(--neon-red); }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>PACIENTE_PORTAL // DAVAS</h1>
+        <h1>PATIENT_PORTAL // MEDICAL_LOG</h1>
         <button class="btn-disconnect" onclick="logout()">LOGOUT</button>
     </header>
 
     <div class="dashboard">
-        <!-- AGENDAR CITA -->
+        <!-- FORMULARIO: REGISTRAR / EDITAR CITA -->
         <div class="panel-box">
-            <h3>NUEVA_CITA_MÉDICA</h3>
+            <h3 id="formTitle">SOLICITAR_NUEVA_CITA</h3>
             <form id="appointmentForm">
+                <input type="hidden" id="editingCitaId" value="">
+                <label style="font-size:14px; color:var(--text-muted); font-weight:bold;">FECHA ATENCIÓN:</label>
                 <input type="date" id="date" class="input-cyber" required>
+                
+                <label style="font-size:14px; color:var(--text-muted); font-weight:bold;">BLOQUE HORARIO:</label>
                 <input type="time" id="time" class="input-cyber" required>
-                <select id="service" class="input-cyber" style="color: #94a3b8; background-color: #0f172a;">
-                    <option value="Consulta Diagnóstica">Consulta Diagnóstica</option>
-                    <option value="Escaneo Ultrasónico (Limpieza)">Escaneo Ultrasónico (Limpieza)</option>
-                    <option value="Alineación Dental (Ortodoncia)">Alineación Dental (Ortodoncia)</option>
-                    <option value="Reconstrucción Estética">Reconstrucción Estética</option>
+                
+                <label style="font-size:14px; color:var(--text-muted); font-weight:bold;">PROCEDIMIENTO ODONTOLÓGICO:</label>
+                <select id="service" class="input-cyber" style="color:#fff; background-color:#0f172a;">
+                    <option value="Consulta Diagnóstica">Consulta Diagnóstica (S/ 80)</option>
+                    <option value="Limpieza Ultra-Dental Indolora">Limpieza Ultra-Dental Indolora (S/ 80)</option>
+                    <option value="Carillas de Resina Estética">Carillas de Resina Estética (S/ 500)</option>
+                    <option value="Implante Dental Bio-Compatible">Implante Dental Bio-Compatible (S/ 1500)</option>
                 </select>
-                <button type="submit" class="btn-cyber">TRANSMITIR SOLICITUD</button>
+                <button type="submit" id="btnSubmitForm" class="btn-cyber">TRANSMITIR SOLICITUD</button>
+                <button type="button" id="btnResetForm" style="display:none; background:transparent; border:none; color:var(--text-muted); cursor:pointer; margin-top:10px; font-family:'Orbitron'; font-size:11px;" onclick="resetFormState()">CANCELAR EDICIÓN</button>
             </form>
         </div>
 
-        <!-- LISTA DE CITAS -->
+        <!-- HISTORIAL COMPLETO -->
         <div class="panel-box">
-            <h3>LOG_DE_CITAS_RESERVADAS</h3>
-            <div id="appointmentsLog">Verificando credenciales de acceso...</div>
+            <h3>LOG_HISTÓRICO_DE_CITAS</h3>
+            <div id="appointmentsLog" style="display:flex; flex-direction:column;">Sincronizando credenciales de red...</div>
         </div>
     </div>
 
     <script>
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
-        const SUPABASE_ANON_KEY = "TU_CLAVE_ANON_REAL_AQUI"; 
+        const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
 
-        // SOLUCIÓN AL PESTAÑEO: Escucha en tiempo real si el usuario está conectado de verdad
         _supabase.auth.onAuthStateChange((event, session) => {
             if (session) {
                 currentUser = session.user;
                 loadAppointments();
             } else {
-                // Si la sesión expira o no existe, redirige de inmediato a la tarjeta de inicio
                 window.location.href = 'index.html';
             }
         });
@@ -90,57 +109,96 @@
             const container = document.getElementById('appointmentsLog');
             if(!container || !currentUser) return;
 
-            const { data: citas, error } = await _supabase.from('citas').select('*').eq('id_paciente', currentUser.id);
+            const { data: citas, error } = await _supabase.from('citas').select('*').eq('id_paciente', currentUser.id).order('fecha', { ascending: false });
             
             if (error || !citas || citas.length === 0) {
-                container.innerHTML = "<p style='color:#64748b;'>No se encontraron transmisiones de citas activas.</p>";
+                container.innerHTML = "<p style='color:var(--text-muted);'>No se registran solicitudes activas en este terminal.</p>";
                 return;
             }
             container.innerHTML = '';
             citas.forEach(cita => {
-                container.innerHTML += `
-                    <div class="appointment-card">
-                        <div>
-                            <div style="font-weight:700; color:#fff;">${cita.servicio}</div>
-                            <div style="color:#64748b; font-size:14px; margin-top:3px;">📅 ${cita.fecha} — ⏰ ${cita.hora}</div>
+                let actionButtons = '';
+                if (cita.estado === 'pendiente') {
+                    actionButtons = `
+                        <div class="actions-area">
+                            <button class="btn-action btn-edit" onclick="startEdit('${cita.id}', '${cita.fecha}', '${cita.hora}', '${cita.servicio}')">RE-PROGRAMAR</button>
+                            <button class="btn-action btn-cancel-cita" onclick="cancelCita('${cita.id}')">ANULAR</button>
                         </div>
-                        <div class="status-badge">${cita.estado.toUpperCase()}</div>
+                    `;
+                }
+
+                container.innerHTML += `
+                    <div class="appointment-card" style="border-left-color: ${cita.estado === 'pendiente' ? '#ffea00' : cita.estado === 'aprobada' ? '#00f3ff' : cita.estado === 'completada' ? '#39ff14' : '#ff0055'}">
+                        <div class="card-header-info">
+                            <div>
+                                <div style="font-weight:700; font-size:18px; color:#fff;">${cita.servicio}</div>
+                                <div style="color:var(--text-muted); font-size:14px; margin-top:5px; font-weight:600;">
+                                    📅 FECHA: <span style="color:#fff;">${cita.fecha}</span> — ⏰ HORA: <span style="color:#fff;">${cita.hora}</span>
+                                </div>
+                            </div>
+                            <span class="status-badge status-${cita.estado}">${cita.estado}</span>
+                        </div>
+                        ${actionButtons}
                     </div>
                 `;
             });
         }
 
+        // AGENDAR O GUARDAR EDICIÓN
         document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             if(!currentUser) return;
 
-            const { error } = await _supabase.from('citas').insert([{
-                id_paciente: currentUser.id,
-                fecha: document.getElementById('date').value,
-                hora: document.getElementById('time').value,
-                servicio: document.getElementById('service').value,
-                estado: 'pendiente'
-            }]);
-            
-            if (error) {
-                alert("Error al agendar: " + error.message);
-            } else { 
-                alert("¡Cita agendada en la Matrix!"); 
-                document.getElementById('appointmentForm').reset();
-                loadAppointments(); 
+            const citaId = document.getElementById('editingCitaId').value;
+            const fecha = document.getElementById('date').value;
+            const hora = document.getElementById('time').value;
+            const servicio = document.getElementById('service').value;
+
+            if (citaId) {
+                // Modo Edición
+                const { error } = await _supabase.from('citas').update({ fecha, hora, servicio }).eq('id', citaId);
+                if (error) alert("Error al modificar: " + error.message);
+                else alert("¡Cita reprogramada con éxito!");
+            } else {
+                // Modo Nueva Cita
+                const { error } = await _supabase.from('citas').insert([{
+                    id_paciente: currentUser.id, fecha, hora, servicio, estado: 'pendiente'
+                }]);
+                if (error) alert("Error al agendar: " + error.message);
+                else alert("¡Transmisión de cita enviada a revisión!");
             }
+
+            resetFormState();
+            loadAppointments();
         });
 
-        async function logout() {
-  // Primero le decimos a Supabase que limpie la sesión en el navegador
-  const { error } = await _supabase.auth.signOut();
-  if (error) {
-    alert("Error al cerrar sesión: " + error.message);
-  } else {
-    // Solo cuando se borró con éxito, nos movemos de página
-    window.location.href = 'index.html';
-  }
-}
+        function startEdit(id, fecha, hora, servicio) {
+            document.getElementById('formTitle').innerText = "MODIFICAR_CITA_ACTIVA";
+            document.getElementById('editingCitaId').value = id;
+            document.getElementById('date').value = fecha;
+            document.getElementById('time').value = hora;
+            document.getElementById('service').value = servicio;
+            document.getElementById('btnSubmitForm').innerText = "GUARDAR CAMBIOS";
+            document.getElementById('btnResetForm').style.display = "block";
+        }
+
+        function resetFormState() {
+            document.getElementById('formTitle').innerText = "SOLICITAR_NUEVA_CITA";
+            document.getElementById('editingCitaId').value = "";
+            document.getElementById('appointmentForm').reset();
+            document.getElementById('btnSubmitForm').innerText = "TRANSMITIR SOLICITUD";
+            document.getElementById('btnResetForm').style.display = "none";
+        }
+
+        async function cancelCita(id) {
+            if(confirm("¿Seguro que deseas anular esta solicitud médica?")) {
+                const { error } = await _supabase.from('citas').update({ estado: 'cancelada' }).eq('id', id);
+                if(error) alert("Error: " + error.message);
+                else loadAppointments();
+            }
+        }
+
+        async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
     </script>
 </body>
 </html>
