@@ -24,6 +24,7 @@
         .btn-disconnect:hover { background: #ff0055; color: #000; box-shadow: 0 0 15px #ff0055; }
         
         .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; padding: 40px; max-width: 1200px; margin: 0 auto; }
+        @media (max-width: 768px) { .dashboard { grid-template-columns: 1fr; } }
         .panel-box { background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(0, 243, 255, 0.15); border-radius: 12px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
         .panel-box h3 { font-family: 'Orbitron', sans-serif; color: var(--neon-cyan); margin-top: 0; border-bottom: 1px dashed rgba(0, 243, 255, 0.2); padding-bottom: 10px; }
         
@@ -51,7 +52,7 @@
             <form id="appointmentForm">
                 <input type="date" id="date" class="input-cyber" required>
                 <input type="time" id="time" class="input-cyber" required>
-                <select id="service" class="input-cyber" style="color: #94a3b8;">
+                <select id="service" class="input-cyber" style="color: #94a3b8; background-color: #0f172a;">
                     <option value="Consulta Diagnóstica">Consulta Diagnóstica</option>
                     <option value="Escaneo Ultrasónico (Limpieza)">Escaneo Ultrasónico (Limpieza)</option>
                     <option value="Alineación Dental (Ortodoncia)">Alineación Dental (Ortodoncia)</option>
@@ -64,28 +65,34 @@
         <!-- LISTA DE CITAS -->
         <div class="panel-box">
             <h3>LOG_DE_CITAS_RESERVADAS</h3>
-            <div id="appointmentsLog">Cargando registros...</div>
+            <div id="appointmentsLog">Verificando credenciales de acceso...</div>
         </div>
     </div>
 
     <script>
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
-        const SUPABASE_ANON_KEY = "TU_CLAVE_ANON_REAL_AQUI"; // Reemplázala
+        const SUPABASE_ANON_KEY = "TU_CLAVE_ANON_REAL_AQUI"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const { data: { user } } = await _supabase.auth.getUser();
-            if (!user) { window.location.href = 'index.html'; return; }
-            currentUser = user;
-            loadAppointments();
+        // SOLUCIÓN AL PESTAÑEO: Escucha en tiempo real si el usuario está conectado de verdad
+        _supabase.auth.onAuthStateChange((event, session) => {
+            if (session) {
+                currentUser = session.user;
+                loadAppointments();
+            } else {
+                // Si la sesión expira o no existe, redirige de inmediato a la tarjeta de inicio
+                window.location.href = 'index.html';
+            }
         });
 
         async function loadAppointments() {
             const container = document.getElementById('appointmentsLog');
+            if(!container || !currentUser) return;
+
             const { data: citas, error } = await _supabase.from('citas').select('*').eq('id_paciente', currentUser.id);
             
-            if (error || citas.length === 0) {
+            if (error || !citas || citas.length === 0) {
                 container.innerHTML = "<p style='color:#64748b;'>No se encontraron transmisiones de citas activas.</p>";
                 return;
             }
@@ -105,6 +112,8 @@
 
         document.getElementById('appointmentForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            if(!currentUser) return;
+
             const { error } = await _supabase.from('citas').insert([{
                 id_paciente: currentUser.id,
                 fecha: document.getElementById('date').value,
@@ -112,8 +121,14 @@
                 servicio: document.getElementById('service').value,
                 estado: 'pendiente'
             }]);
-            if (error) alert("Error: " + error.message);
-            else { alert("¡Cita agendada en la Matrix!"); loadAppointments(); }
+            
+            if (error) {
+                alert("Error al agendar: " + error.message);
+            } else { 
+                alert("¡Cita agendada en la Matrix!"); 
+                document.getElementById('appointmentForm').reset();
+                loadAppointments(); 
+            }
         });
 
         async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
