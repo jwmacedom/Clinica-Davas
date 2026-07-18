@@ -243,6 +243,19 @@
                 window.location.replace('paciente.html'); 
             }
         });
+
+        async function limpiezaFuerzaBruta() {
+    // 1. Forzar a Supabase a cerrar la sesión
+    await _supabase.auth.signOut();
+    
+    // 2. Limpiar la memoria local del navegador manualmente
+    localStorage.clear();
+    sessionStorage.clear();
+    
+    alert("MEMORIA_LIMPIADA: Sesión destruida con éxito.");
+    
+    // 3. Recargar la página totalmente limpia
+    window.location.reload();
     </script>
 </body>
 </html>
