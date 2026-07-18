@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DaVas | Central Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-color: #060a13;
+            --neon-blue: #0066ff;
+            --neon-cyan: #00f3ff;
+            --text-color: #e2e8f0;
+        }
+        body { margin: 0; background-color: var(--bg-color); color: var(--text-color); font-family: 'Rajdhani', sans-serif; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px 40px; border-bottom: 1px solid rgba(0, 102, 255, 0.3); background: #0a0f1d; }
+        header h1 { font-family: 'Orbitron', sans-serif; font-size: 20px; color: var(--neon-blue); text-shadow: 0 0 10px rgba(0,102,255,0.5); margin: 0; }
+        
+        .container { padding: 40px; max-width: 1200px; margin: 0 auto; }
+        .cyber-table-box { background: #0f172a; border: 1px solid rgba(0, 102, 255, 0.2); border-radius: 8px; overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th { background: rgba(0, 102, 255, 0.1); color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-size: 13px; padding: 15px; border-bottom: 1px solid rgba(0, 102, 255, 0.2); }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 16px; color: #94a3b8; }
+        tr:hover { background: rgba(255,255,255,0.02); }
+        
+        .btn-logout { background: transparent; border: 1px solid #ff0055; color: #ff0055; padding: 8px 15px; font-family: 'Orbitron', sans-serif; cursor: pointer; border-radius: 4px; }
+        .btn-logout:hover { background: #ff0055; color: black; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>MAIN_CORE // CONTROL_PANEL</h1>
+        <button class="btn-logout" onclick="logout()">SHUTDOWN</button>
+    </header>
+
+    <div class="container">
+        <h2 style="font-family:'Orbitron'; margin-bottom:20px; font-size:22px;">AGENDA_GLOBAL_DE_CITAS</h2>
+        
+        <div class="cyber-table-box">
+            <table>
+                <thead>
+                    <tr>
+                        <th>PACIENTE_ID</th>
+                        <th>FECHA_SISTEMA</th>
+                        <th>HORA_BLOQUE</th>
+                        <th>SERVICIO_SOLICITADO</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="adminTableBody">
+                    <tr><td colspan="5" style="text-align:center;">Sincronizando con la red de datos...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co";
+        const SUPABASE_ANON_KEY = "TU_CLAVE_ANON_REAL_AQUI"; // Reemplázala
+        const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const { data: { user } } = await _supabase.auth.getUser();
+            if (!user) { window.location.href = 'index.html'; return; }
+            
+            // Cargar todas las citas de la base de datos
+            const { data: citas, error } = await _supabase.from('citas').select('*').order('fecha', { ascending: true });
+            const tbody = document.getElementById('adminTableBody');
+            
+            if (error || citas.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;">No hay flujos de citas activos.</td></tr>`;
+                return;
+            }
+            
+            tbody.innerHTML = '';
+            citas.forEach(cita => {
+                tbody.innerHTML += `
+                    <tr>
+                        <td style="font-family:'Orbitron'; font-size:12px; color:var(--neon-cyan);">${cita.id_paciente.substring(0,8)}...</td>
+                        <td>${cita.fecha}</td>
+                        <td>${cita.hora}</td>
+                        <td style="color:#fff; font-weight:bold;">${cita.servicio}</td>
+                        <td><span style="color:#ffea00;">${cita.estado.toUpperCase()}</span></td>
+                    </tr>
+                `;
+            });
+        });
+
+        async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
+    </script>
+</body>
+</html>
