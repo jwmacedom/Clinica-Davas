@@ -265,7 +265,7 @@
             alert("SISTEMA_REINICIADO: Memoria temporal purgada."); window.location.reload();
         }
 
-        // LÓGICA DE LOGIN
+        // LÓGICA DE LOGIN EN INDEX.HTML
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -276,13 +276,18 @@
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) { alert("ERROR: " + error.message); btn.innerText = "CONECTAR"; btn.disabled = false; return; }
 
-            // AQUÍ COMPRUEBA EL ROL EN LA TABLA PERFILES
-            const { data: perfil } = await _supabase.from('perfiles').select('rol').eq('id', data.user.id).single();
+            // Buscamos el perfil del usuario utilizando su ID de autenticación
+            const { data: perfil, error: perfilError } = await _supabase
+                .from('perfiles')
+                .select('rol')
+                .eq('id', data.user.id)
+                .maybeSingle(); // Cambiado a maybeSingle para evitar caídas bruscas de datos
             
+            // Forzamos la redirección según lo que diga la columna 'rol'
             if (perfil && perfil.rol === 'admin') {
-                window.location.replace('admin.html'); // Si es admin, ve al panel global
+                window.location.href = 'admin.html'; // Si es admin, va al panel global
             } else {
-                window.location.replace('paciente.html'); // Si es paciente, ve a sus citas propias
+                window.location.href = 'paciente.html'; // Si es paciente, va a su log propio
             }
         });
         
