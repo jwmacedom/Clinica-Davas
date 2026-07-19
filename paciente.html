@@ -55,13 +55,13 @@
 <body>
 
     <header>
-        <h1>PATIENT_PORTAL // MEDICAL_LOG</h1>
+        <h1 id="portalTitle">PATIENT_PORTAL // MEDICAL_LOG</h1>
         <button class="btn-disconnect" onclick="logout()">LOGOUT</button>
     </header>
 
     <div class="dashboard">
         <!-- FORMULARIO: REGISTRAR / EDITAR CITA -->
-        <div class="panel-box">
+        <div class="panel-box" id="creationPanel">
             <h3 id="formTitle">SOLICITAR_NUEVA_CITA</h3>
             <form id="appointmentForm">
                 <input type="hidden" id="editingCitaId" value="">
@@ -84,7 +84,7 @@
         </div>
 
         <!-- HISTORIAL COMPLETO -->
-        <div class="panel-box">
+        <div class="panel-box" style="grid-column: span 1;">
             <h3>LOG_HISTÓRICO_DE_CITAS</h3>
             <div id="appointmentsLog" style="display:flex; flex-direction:column;">Sincronizando credenciales de red...</div>
         </div>
@@ -95,10 +95,22 @@
         const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         let currentUser = null;
+        let userRole = 'paciente';
 
-        _supabase.auth.onAuthStateChange((event, session) => {
+        _supabase.auth.onAuthStateChange(async (event, session) => {
             if (session) {
                 currentUser = session.user;
+                
+                // Consultamos el rol en tiempo real para adaptar los filtros
+                const { data: perfil } = await _supabase.from('perfiles').select('rol').eq('id', currentUser.id).maybeSingle();
+                if(perfil) {
+                    userRole = perfil.rol.trim().toLowerCase();
+                    if(userRole === 'admin') {
+                        document.getElementById('portalTitle').innerText = "ADMINISTRATOR_VIEW // OVERALL_LOG";
+                        document.getElementById('creationPanel').style.display = "none"; // Ocultar formulario de agendar para el admin
+                        document.querySelector('.dashboard').style.gridTemplateColumns = "1fr"; // Expandir tabla a ancho completo
+                    }
+                }
                 loadAppointments();
             } else {
                 window.location.href = 'index.html';
@@ -109,12 +121,20 @@
             const container = document.getElementById('appointmentsLog');
             if(!container || !currentUser) return;
 
-            const { data: citas, error } = await _supabase.from('citas').select('*').eq('id_paciente', currentUser.id).order('fecha', { ascending: false });
+            // CORRECCIÓN DIRECTA: Si es admin descarga TODO, si es paciente filtra por su ID
+            let query = _supabase.from('citas').select('*');
+            
+            if (userRole !== 'admin') {
+                query = query.eq('id_paciente', currentUser.id);
+            }
+            
+            const { data: citas, error } = await query.order('fecha', { ascending: false });
             
             if (error || !citas || citas.length === 0) {
                 container.innerHTML = "<p style='color:var(--text-muted);'>No se registran solicitudes activas en este terminal.</p>";
                 return;
             }
+            
             container.innerHTML = '';
             citas.forEach(cita => {
                 let actionButtons = '';
@@ -155,12 +175,10 @@
             const servicio = document.getElementById('service').value;
 
             if (citaId) {
-                // Modo Edición
                 const { error } = await _supabase.from('citas').update({ fecha, hora, servicio }).eq('id', citaId);
                 if (error) alert("Error al modificar: " + error.message);
                 else alert("¡Cita reprogramada con éxito!");
             } else {
-                // Modo Nueva Cita
                 const { error } = await _supabase.from('citas').insert([{
                     id_paciente: currentUser.id, fecha, hora, servicio, estado: 'pendiente'
                 }]);
