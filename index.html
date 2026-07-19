@@ -276,10 +276,16 @@
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) { alert("ERROR: " + error.message); btn.innerText = "CONECTAR"; btn.disabled = false; return; }
 
+            // AQUÍ COMPRUEBA EL ROL EN LA TABLA PERFILES
             const { data: perfil } = await _supabase.from('perfiles').select('rol').eq('id', data.user.id).single();
-            if (perfil && perfil.rol === 'admin') window.location.replace('admin.html');
-            else window.location.replace('paciente.html');
+            
+            if (perfil && perfil.rol === 'admin') {
+                window.location.replace('admin.html'); // Si es admin, ve al panel global
+            } else {
+                window.location.replace('paciente.html'); // Si es paciente, ve a sus citas propias
+            }
         });
+        
 
         // LÓGICA DE REGISTRO AUTOMÁTICO DE PACIENTES
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
