@@ -217,7 +217,7 @@
                 <div class="showcase-card">
                     <div>
                         <h4>Crema de Regeneración Dérmica Oral</h4>
-                        <p style="color:var(--text-muted); margin:0; line-height:1.5;">Tratamiento complementario clínico para revitalizar tejidos periorales, acelerar cicatrizaciones y mantener encías hidratadas.</p>
+                        <p style="color:var(--text-muted); margin:0; line-height:1.7;">Tratamiento complementario clínico para revitalizar tejidos periorales, acelerar cicatrizaciones y mantener encías hidratadas.</p>
                     </div>
                     <div class="price-tag">S/ 500</div>
                 </div>
@@ -243,7 +243,6 @@
     </div>
 
     <script>
-        // CORRECCIÓN DIRECTA DE LA TOKEN API KEY REAL
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
         const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -265,7 +264,37 @@
             alert("SISTEMA_REINICIADO: Memoria temporal purgada."); window.location.reload();
         }
 
-        // LÓGICA DE LOGIN RE-ESTRUCTURADA E INMUNIZADA
+        // REDIRECCIÓN INTELIGENTE SEGÚN EL ROL DE LA BASE DE DATOS
+        async function redirigirSegunRol(userId) {
+            try {
+                const { data: perfil, error } = await _supabase
+                    .from('perfiles')
+                    .select('rol')
+                    .eq('id', userId)
+                    .maybeSingle();
+
+                if (perfil && perfil.rol) {
+                    const userRole = perfil.rol.trim().toLowerCase();
+                    if (userRole === 'admin') {
+                        window.location.replace("https://jwmacedom.github.io/Clinica-Davas/admin.html");
+                        return;
+                    }
+                }
+                // Por defecto o si es paciente, va a paciente.html
+                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/paciente.html");
+            } catch (err) {
+                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/paciente.html");
+            }
+        }
+
+        // CONTROLADOR DE SESIÓN ACTIVA AL CARGAR LA PÁGINA
+        _supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                await redirigirSegunRol(session.user.id);
+            }
+        });
+
+        // PROCESADOR DEL FORMULARIO DE INICIO DE SESIÓN
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -274,25 +303,19 @@
             btn.innerText = "VERIFICANDO..."; btn.disabled = true;
 
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
-            if (error) { alert("ERROR: " + error.message); btn.innerText = "CONECTAR"; btn.disabled = false; return; }
+            if (error) { 
+                alert("ERROR: " + error.message); 
+                btn.innerText = "CONECTAR"; 
+                btn.disabled = false; 
+                return; 
+            }
 
-            // Buscamos el perfil forzando la limpieza de texto (.trim() y pasándolo a minúsculas)
-            const { data: perfil, error: perfilError } = await _supabase
-                .from('perfiles')
-                .select('rol')
-                .eq('id', data.user.id)
-                .maybeSingle();
-            
-            // CORRECCIÓN BLINDADA: Validamos ignorando si viene con espacios o variaciones de letras
-            if (perfil && perfil.rol.trim().toLowerCase() === 'admin') {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'paciente.html';
+            if (data && data.user) {
+                await redirigirSegunRol(data.user.id);
             }
         });
-        
 
-        // LÓGICA DE REGISTRO AUTOMÁTICO DE PACIENTES
+        // PROCESADOR DEL FORMULARIO DE REGISTRO
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value;
