@@ -84,7 +84,7 @@
         </div>
 
         <!-- HISTORIAL COMPLETO -->
-        <div class="panel-box" style="grid-column: span 1;">
+        <div class="panel-box" id="logPanelBox">
             <h3>LOG_HISTÓRICO_DE_CITAS</h3>
             <div id="appointmentsLog" style="display:flex; flex-direction:column;">Sincronizando credenciales de red...</div>
         </div>
@@ -98,32 +98,46 @@
         let userRole = 'paciente';
 
         _supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_OUT' || !session) {
+                currentUser = null;
+                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/index.html");
+                return;
+            }
+
             if (session) {
                 currentUser = session.user;
                 
-                // Consultamos el rol en tiempo real para adaptar los filtros
+                // Consultamos el rol en la tabla perfiles
                 const { data: perfil } = await _supabase.from('perfiles').select('rol').eq('id', currentUser.id).maybeSingle();
                 if(perfil) {
                     userRole = perfil.rol.trim().toLowerCase();
                     if(userRole === 'admin') {
                         document.getElementById('portalTitle').innerText = "ADMINISTRATOR_VIEW // OVERALL_LOG";
-                        document.getElementById('creationPanel').style.display = "none"; // Ocultar formulario de agendar para el admin
-                        document.querySelector('.dashboard').style.gridTemplateColumns = "1fr"; // Expandir tabla a ancho completo
+                        if(document.getElementById('creationPanel')) {
+                            document.getElementById('creationPanel').style.display = "none";
+                        }
+                        document.querySelector('.dashboard').style.gridTemplateColumns = "1fr";
                     }
                 }
                 loadAppointments();
-            } else {
-                window.location.href = 'index.html';
             }
-        });
+        </script>
 
+        <script>
+        // Separé la función para evitar conflictos de sintaxis de carga
         async function loadAppointments() {
             const container = document.getElementById('appointmentsLog');
             if(!container || !currentUser) return;
 
-            // CORRECCIÓN DIRECTA: Si es admin descarga TODO, si es paciente filtra por su ID
+            // 1. Cargamos el mapa de perfiles para saber los nombres de los pacientes si eres admin
+            const { data: perfiles } = await _supabase.from('perfiles').select('id, nombre');
+            const perfilMap = {};
+            if(perfiles) perfiles.forEach(p => perfilMap[p.id] = p.nombre);
+
+            // 2. Construimos la consulta base
             let query = _supabase.from('citas').select('*');
             
+            // Si el rol NO es admin, forzamos que traiga únicamente lo del paciente logueado
             if (userRole !== 'admin') {
                 query = query.eq('id_paciente', currentUser.id);
             }
@@ -147,10 +161,15 @@
                     `;
                 }
 
+                // Identificamos el nombre del paciente dueño de la cita
+                const dueñoCita = perfilMap[cita.id_paciente] || `Paciente Extraño`;
+
+                // Renderizamos la tarjeta añadiendo el nombre si el rol es administrativo
                 container.innerHTML += `
                     <div class="appointment-card" style="border-left-color: ${cita.estado === 'pendiente' ? '#ffea00' : cita.estado === 'aprobada' ? '#00f3ff' : cita.estado === 'completada' ? '#39ff14' : '#ff0055'}">
                         <div class="card-header-info">
                             <div>
+                                <div style="font-size:12px; font-family:'Orbitron'; color:var(--neon-cyan); margin-bottom:4px; display:${userRole === 'admin' ? 'block' : 'none'};">FICHA PACIENTE: ${dueñoCita.toUpperCase()}</div>
                                 <div style="font-weight:700; font-size:18px; color:#fff;">${cita.servicio}</div>
                                 <div style="color:var(--text-muted); font-size:14px; margin-top:5px; font-weight:600;">
                                     📅 FECHA: <span style="color:#fff;">${cita.fecha}</span> — ⏰ HORA: <span style="color:#fff;">${cita.hora}</span>
@@ -216,7 +235,17 @@
             }
         }
 
-        async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
+        // SALIDA TOTAL DE LA RED
+        async function logout() { 
+            try {
+                await _supabase.auth.signOut();
+                localStorage.clear();
+                sessionStorage.clear();
+                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/index.html");
+            } catch (err) {
+                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/index.html");
+            }
+        }
     </script>
 </body>
 </html>
