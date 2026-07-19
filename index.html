@@ -243,9 +243,9 @@
     </div>
 
     <script>
-        // CONFIGURACIÓN DE RED ASIGNADA AUTOMÁTICAMENTE
+        // CORRECCIÓN DIRECTA DE LA TOKEN API KEY REAL
         const SUPABASE_URL = "https://bqyrzkjtbwiogjoquzki.supabase.co"; 
-        const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxeXJ6a2p0Yndpb2dqb3F1emtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQzMTczNzYsImV4cCI6MjA5OTg5MzM3Nn0.-bT8iWEV4g84spa5EtObFSbTVrpwm-HPI2MFkyOcdjQ"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         function openForm(type) {
@@ -265,7 +265,7 @@
             alert("SISTEMA_REINICIADO: Memoria temporal purgada."); window.location.reload();
         }
 
-        // LÓGICA DE LOGIN EN INDEX.HTML
+        // LÓGICA DE LOGIN RE-ESTRUCTURADA E INMUNIZADA
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('email').value;
@@ -276,18 +276,18 @@
             const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
             if (error) { alert("ERROR: " + error.message); btn.innerText = "CONECTAR"; btn.disabled = false; return; }
 
-            // Buscamos el perfil del usuario utilizando su ID de autenticación
+            // Buscamos el perfil forzando la limpieza de texto (.trim() y pasándolo a minúsculas)
             const { data: perfil, error: perfilError } = await _supabase
                 .from('perfiles')
                 .select('rol')
                 .eq('id', data.user.id)
-                .maybeSingle(); // Cambiado a maybeSingle para evitar caídas bruscas de datos
+                .maybeSingle();
             
-            // Forzamos la redirección según lo que diga la columna 'rol'
-            if (perfil && perfil.rol === 'admin') {
-                window.location.href = 'admin.html'; // Si es admin, va al panel global
+            // CORRECCIÓN BLINDADA: Validamos ignorando si viene con espacios o variaciones de letras
+            if (perfil && perfil.rol.trim().toLowerCase() === 'admin') {
+                window.location.href = 'admin.html';
             } else {
-                window.location.href = 'paciente.html'; // Si es paciente, va a su log propio
+                window.location.href = 'paciente.html';
             }
         });
         
@@ -301,12 +301,10 @@
             const btn = e.target.querySelector('.btn-submit');
             btn.innerText = "CREANDO..."; btn.disabled = true;
 
-            // 1. Crear usuario en la autenticación de Supabase
             const { data, error } = await _supabase.auth.signUp({ email, password });
             if (error) { alert("Error al registrar: " + error.message); btn.innerText = "CREAR_CUENTA"; btn.disabled = false; return; }
 
             if(data.user) {
-                // 2. Insertar automáticamente su perfil como 'paciente'
                 await _supabase.from('perfiles').insert([{ id: data.user.id, nombre: name, rol: 'paciente' }]);
                 alert("¡Registro exitoso! Ya puedes iniciar sesión con tu cuenta.");
                 e.target.reset();
