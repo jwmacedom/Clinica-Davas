@@ -137,11 +137,11 @@
                     selectAcciones = `<span style="color:var(--text-muted); font-size:12px; font-family:'Orbitron';">REGISTRO_CERRADO</span>`;
                 }
 
-                // Color de estado estético
+                // CORRECCIÓN: Se cambiaron los "var(--color)" que daban error de sintaxis por textos hexadecimales planos
                 let colorEstado = '#ffea00';
-                if(cita.estado === 'aprobada') colorEstado = var(--neon-cyan);
-                if(cita.estado === 'completada') colorEstado = var(--neon-green);
-                if(cita.estado === 'cancelada') colorEstado = var(--neon-red);
+                if(cita.estado === 'aprobada') colorEstado = '#00f3ff';
+                if(cita.estado === 'completada') colorEstado = '#39ff14';
+                if(cita.estado === 'cancelada') colorEstado = '#ff0055';
 
                 tbody.innerHTML += `
                     <tr>
@@ -157,7 +157,7 @@
                 if(cita.fecha === hoyStr && cita.estado !== 'cancelada') {
                     contadorHoy++;
                     todayContainer.innerHTML += `
-                        <div class="today-card" style="border-left-color: ${cita.estado === 'completada' ? 'var(--neon-green)' : 'var(--neon-cyan)'}">
+                        <div class="today-card" style="border-left-color: ${cita.estado === 'completada' ? '#39ff14' : '#00f3ff'}">
                             <div style="font-weight:700; color:#fff;">⏰ ${cita.hora} — ${nombrePaciente}</div>
                             <div style="color:var(--text-muted); font-size:13px; margin-top:3px;">${cita.servicio}</div>
                             <div style="font-size:11px; font-family:'Orbitron'; color:${colorEstado}; margin-top:4px;">STATUS: ${cita.estado.toUpperCase()}</div>
