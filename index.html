@@ -266,32 +266,30 @@
 
         // REDIRECCIÓN INTELIGENTE SEGÚN EL ROL DE LA BASE DE DATOS
        async function redirigirSegunRol(userId) {
-    const { data: perfil, error } = await _supabase
-        .from('perfiles')
-        .select('rol')
-        .eq('id', userId)
-        .maybeSingle();
+        const { data: perfil, error } = await _supabase
+            .from('perfiles')
+            .select('rol')
+            .eq('id', userId)
+            .maybeSingle();
 
-    if (error) {
-        alert("Error al leer perfil: " + error.message);
-        window.location.replace("paciente.html");
-        return;
-    }
+        if (error) {
+            console.error("Error al leer perfil:", error.message);
+            window.location.replace("paciente.html");
+            return;
+        }
 
-    if (!perfil) {
-        alert("Atención: No se encontró un registro en la tabla 'perfiles' para tu UID: " + userId);
-        window.location.replace("paciente.html");
-        return;
-    }
+        if (!perfil) {
+            window.location.replace("paciente.html");
+            return;
+        }
 
-    alert("Rol encontrado: " + perfil.rol); // Muestra qué rol lee
-
-    if (perfil.rol && perfil.rol.trim().toLowerCase() === 'admin') {
-        window.location.replace("admin.html");
-    } else {
-        window.location.replace("paciente.html");
-    }
-}
+            // Redirección directa según el rol guardado en la base de datos
+        if (perfil.rol && perfil.rol.trim().toLowerCase() === 'admin') {
+            window.location.replace("admin.html");
+        } else {
+            window.location.replace("paciente.html");
+            }
+       }
 
         // CONTROLADOR DE SESIÓN ACTIVA AL CARGAR LA PÁGINA
         _supabase.auth.onAuthStateChange(async (event, session) => {
