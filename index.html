@@ -265,27 +265,33 @@
         }
 
         // REDIRECCIÓN INTELIGENTE SEGÚN EL ROL DE LA BASE DE DATOS
-        async function redirigirSegunRol(userId) {
-            try {
-                const { data: perfil, error } = await _supabase
-                    .from('perfiles')
-                    .select('rol')
-                    .eq('id', userId)
-                    .maybeSingle();
+       async function redirigirSegunRol(userId) {
+    const { data: perfil, error } = await _supabase
+        .from('perfiles')
+        .select('rol')
+        .eq('id', userId)
+        .maybeSingle();
 
-                if (perfil && perfil.rol) {
-                    const userRole = perfil.rol.trim().toLowerCase();
-                    if (userRole === 'admin') {
-                        window.location.replace("https://jwmacedom.github.io/Clinica-Davas/admin.html");
-                        return;
-                    }
-                }
-                // Por defecto o si es paciente, va a paciente.html
-                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/paciente.html");
-            } catch (err) {
-                window.location.replace("https://jwmacedom.github.io/Clinica-Davas/paciente.html");
-            }
-        }
+    if (error) {
+        alert("Error al leer perfil: " + error.message);
+        window.location.replace("paciente.html");
+        return;
+    }
+
+    if (!perfil) {
+        alert("Atención: No se encontró un registro en la tabla 'perfiles' para tu UID: " + userId);
+        window.location.replace("paciente.html");
+        return;
+    }
+
+    alert("Rol encontrado: " + perfil.rol); // Muestra qué rol lee
+
+    if (perfil.rol && perfil.rol.trim().toLowerCase() === 'admin') {
+        window.location.replace("admin.html");
+    } else {
+        window.location.replace("paciente.html");
+    }
+}
 
         // CONTROLADOR DE SESIÓN ACTIVA AL CARGAR LA PÁGINA
         _supabase.auth.onAuthStateChange(async (event, session) => {
