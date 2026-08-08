@@ -24,7 +24,7 @@
         .btn-logout { background: transparent; border: 1px solid var(--neon-red); color: var(--neon-red); padding: 8px 15px; font-family: 'Orbitron', sans-serif; cursor: pointer; border-radius: 4px; font-weight: bold; }
         .btn-logout:hover { background: var(--neon-red); color: black; box-shadow: 0 0 10px var(--neon-red); }
         
-        .admin-layout { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; padding: 40px; max-width: 1600px; margin: 0 auto; }
+        .admin-layout { display: grid; grid-template-columns: 2.2fr 1fr; gap: 30px; padding: 40px; max-width: 1600px; margin: 0 auto; }
         @media (max-width: 1024px) { .admin-layout { grid-template-columns: 1fr; } }
         
         .cyber-box { background: var(--panel-bg); border: 1px solid rgba(0, 102, 255, 0.2); border-radius: 12px; padding: 25px; box-shadow: 0 0 20px rgba(0,0,0,0.4); }
@@ -61,14 +61,15 @@
                     <thead>
                         <tr>
                             <th>PACIENTE</th>
+                            <th>CELULAR</th>
                             <th>FECHA / HORA</th>
                             <th>SERVICIO</th>
                             <th>ESTADO</th>
-                            <th>ACCIONES_DE_SISTEMA</th>
+                            <th>ACCIONES</th>
                         </tr>
                     </thead>
                     <tbody id="adminTableBody">
-                        <tr><td colspan="5" style="text-align:center; color:var(--text-muted);">Sincronizando registros globales...</td></tr>
+                        <tr><td colspan="6" style="text-align:center; color:var(--text-muted);">Sincronizando registros globales...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -87,7 +88,6 @@
         const SUPABASE_ANON_KEY = "sb_publishable_i9dwc6oEIcxhJcL_ruBAUQ_gdnfAdTC"; 
         const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Obtener fecha local de hoy en formato YYYY-MM-DD
         const hoy = new Date();
         const hoyStr = hoy.toISOString().split('T')[0];
         document.getElementById('todayDateStr').innerText = `SISTEMA_DATE: [ ${hoyStr} ]`;
@@ -101,30 +101,35 @@
         });
 
         async function loadGlobalData() {
-            // Cargar perfiles para emparejar nombres de los pacientes
-            const { data: perfiles } = await _supabase.from('perfiles').select('id, nombre');
+            // Cargar perfiles obteniendo tanto el nombre como el teléfono
+            const { data: perfiles } = await _supabase.from('perfiles').select('id, nombre, telefono');
             const perfilMap = {};
-            if(perfiles) perfiles.forEach(p => perfilMap[p.id] = p.nombre);
+            if(perfiles) {
+                perfiles.forEach(p => {
+                    perfilMap[p.id] = {
+                        nombre: p.nombre || 'Sin nombre',
+                        telefono: p.telefono || 'Sin celular'
+                    };
+                });
+            }
 
-            // Obtener todas las citas ordenadas cronológicamente
             const { data: citas, error } = await _supabase.from('citas').select('*').order('fecha', { ascending: true });
             
             const tbody = document.getElementById('adminTableBody');
             const todayContainer = document.getElementById('todayAppointmentsLog');
             
             if (error || !citas || citas.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted);">No hay transmisiones de datos activas.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; color:var(--text-muted);">No hay transmisiones de datos activas.</td></tr>`;
                 todayContainer.innerHTML = "<p style='color:var(--text-muted);'>Cero pacientes en el core del día.</p>";
                 return;
             }
 
-            // 1. LIMPIAR Y RELLENAR TABLA GLOBAL
             tbody.innerHTML = '';
             todayContainer.innerHTML = '';
             let contadorHoy = 0;
 
             citas.forEach(cita => {
-                const nombrePaciente = perfilMap[cita.id_paciente] || `ID: ${cita.id_paciente.substring(0,6)}`;
+                const infoPaciente = perfilMap[cita.id_paciente] || { nombre: `ID: ${cita.id_paciente.substring(0,6)}`, telefono: 'N/A' };
                 
                 let selectAcciones = '';
                 if(cita.estado !== 'completada' && cita.estado !== 'cancelada') {
@@ -137,7 +142,6 @@
                     selectAcciones = `<span style="color:var(--text-muted); font-size:12px; font-family:'Orbitron';">REGISTRO_CERRADO</span>`;
                 }
 
-                // CORRECCIÓN: Se cambiaron los "var(--color)" que daban error de sintaxis por textos hexadecimales planos
                 let colorEstado = '#ffea00';
                 if(cita.estado === 'aprobada') colorEstado = '#00f3ff';
                 if(cita.estado === 'completada') colorEstado = '#39ff14';
@@ -145,7 +149,8 @@
 
                 tbody.innerHTML += `
                     <tr>
-                        <td style="font-weight:600;">${nombrePaciente}</td>
+                        <td style="font-weight:600;">${infoPaciente.nombre}</td>
+                        <td style="color:var(--neon-cyan); font-weight:bold;">📱 ${infoPaciente.telefono}</td>
                         <td>📅 ${cita.fecha} &nbsp;&nbsp; ⏰ ${cita.hora}</td>
                         <td style="color:#fff; font-weight:bold;">${cita.servicio}</td>
                         <td><span style="color:${colorEstado}; font-weight:bold; font-family:'Orbitron'; font-size:12px;">${cita.estado.toUpperCase()}</span></td>
@@ -153,12 +158,12 @@
                     </tr>
                 `;
 
-                // 2. FILTRAR EN TIEMPO REAL PARA EL MONITOR LATERAL DIARIO
                 if(cita.fecha === hoyStr && cita.estado !== 'cancelada') {
                     contadorHoy++;
                     todayContainer.innerHTML += `
                         <div class="today-card" style="border-left-color: ${cita.estado === 'completada' ? '#39ff14' : '#00f3ff'}">
-                            <div style="font-weight:700; color:#fff;">⏰ ${cita.hora} — ${nombrePaciente}</div>
+                            <div style="font-weight:700; color:#fff;">⏰ ${cita.hora} — ${infoPaciente.nombre}</div>
+                            <div style="color:var(--neon-cyan); font-size:13px; font-weight:bold;">📱 ${infoPaciente.telefono}</div>
                             <div style="color:var(--text-muted); font-size:13px; margin-top:3px;">${cita.servicio}</div>
                             <div style="font-size:11px; font-family:'Orbitron'; color:${colorEstado}; margin-top:4px;">STATUS: ${cita.estado.toUpperCase()}</div>
                         </div>
