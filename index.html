@@ -206,7 +206,6 @@
                     <h3 style="font-family:'Orbitron'; margin:0 0 15px 0; color:var(--neon-green); text-align:center; letter-spacing:1px;">NUEVO_REGISTRO</h3>
                     <form id="registerForm">
                         <div class="input-group"><input type="text" id="regName" placeholder="NOMBRE_COMPLETO" required></div>
-                        <div class="input-group"><input type="text" id="regNamber" placeholder="NUMERO DE CELULAR" required></div>
                         <div class="input-group"><input type="email" id="regEmail" placeholder="CORREO_ELECTRÓNICO" required></div>
                         <div class="input-group"><input type="password" id="regPassword" placeholder="CONTRASENA (Min. 6 caracteres)" minlength="6" required></div>
                         <div class="login-actions">
@@ -367,7 +366,6 @@
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = document.getElementById('regName').value;
-            const name = document.getElementById('regNamber').value;
             const email = document.getElementById('regEmail').value;
             const password = document.getElementById('regPassword').value;
             const btn = e.target.querySelector('.btn-submit');
